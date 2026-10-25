@@ -865,6 +865,33 @@ def sync_stix_cmd(
             console.print(f"  ... and {len(extracted) - 10} more techniques.")
 
 
+@app.command("convert")
+def convert_cmd(
+    input_path: Path = typer.Argument(..., help="Path to input external trace file", exists=True),
+    format_type: str = typer.Option("otrf", "--format", "-f", help="Source format: 'otrf', 'winmet', or 'cape'"),
+    output_path: Optional[Path] = typer.Option(None, "--output", "-o", help="Path to write converted MalTrace JSON file")
+):
+    """
+    Convert external datasets (OTRF / OSSEM Sysmon, WinMET, CAPE) into canonical MalTrace format.
+    """
+    from maltrace.ingestion.converters import convert_otrf_sysmon, convert_winmet, convert_cape
+
+    fmt = format_type.lower().strip()
+    if fmt in ("otrf", "sysmon"):
+        doc = convert_otrf_sysmon(input_path, output_path=output_path)
+    elif fmt == "winmet":
+        doc = convert_winmet(input_path, output_path=output_path)
+    elif fmt == "cape":
+        doc = convert_cape(input_path, output_path=output_path)
+    else:
+        console.print(f"[bold red]Unknown format:[/bold red] '{format_type}'. Expected 'otrf', 'winmet', or 'cape'.")
+        raise typer.Exit(code=1)
+
+    console.print(f"[bold green]Converted {len(doc['events'])} events from {fmt.upper()} to canonical MalTrace schema.[/bold green]")
+    if output_path:
+        console.print(f"Saved converted trace to: [cyan]{output_path}[/cyan]")
+
+
 if __name__ == "__main__":
     app()
 

@@ -69,18 +69,25 @@ class TfidfBehaviorClassifier:
             self.clf.fit(texts, y)
             return self
 
-        if calib_texts and calib_y and len(set(calib_y)) > 1:
-            # Fit classifier on train, then fit calibration ONLY on held-out calibration split
-            base_clf = LogisticRegression(C=1.0, random_state=self.seed, max_iter=500, solver="lbfgs")
-            base_clf.fit(X_tfidf, y_encoded)
+        if calib_texts and calib_y:
+            known_classes = set(self.classes_)
+            valid_idx = [i for i, lbl in enumerate(calib_y) if lbl in known_classes]
+            if len(valid_idx) >= 2 and len(set(calib_y[i] for i in valid_idx)) > 1:
+                base_clf = LogisticRegression(C=1.0, random_state=self.seed, max_iter=500, solver="lbfgs")
+                base_clf.fit(X_tfidf, y_encoded)
 
-            X_calib = self.vectorizer.transform(calib_texts)
-            y_calib_enc = self.label_encoder.transform(calib_y)
+                calib_t_filt = [calib_texts[i] for i in valid_idx]
+                calib_y_filt = [calib_y[i] for i in valid_idx]
 
-            calibrated = CalibratedClassifierCV(estimator=base_clf, method="sigmoid", cv="prefit")
-            calibrated.fit(X_calib, y_calib_enc)
-            self.clf = calibrated
-            self.is_calibrated = True
+                X_calib = self.vectorizer.transform(calib_t_filt)
+                y_calib_enc = self.label_encoder.transform(calib_y_filt)
+
+                calibrated = CalibratedClassifierCV(estimator=base_clf, method="sigmoid", cv="prefit")
+                calibrated.fit(X_calib, y_calib_enc)
+                self.clf = calibrated
+                self.is_calibrated = True
+            else:
+                self.clf.fit(X_tfidf, y_encoded)
         else:
             self.clf.fit(X_tfidf, y_encoded)
 
@@ -126,17 +133,25 @@ class StructuredCountClassifier:
             self.clf.fit(X, y)
             return self
 
-        if calib_X is not None and calib_y and len(set(calib_y)) > 1:
-            base_clf = LogisticRegression(C=1.0, random_state=self.seed, max_iter=500, solver="lbfgs")
-            base_clf.fit(X_scaled, y_encoded)
+        if calib_X is not None and calib_y:
+            known_classes = set(self.classes_)
+            valid_idx = [i for i, lbl in enumerate(calib_y) if lbl in known_classes]
+            if len(valid_idx) >= 2 and len(set(calib_y[i] for i in valid_idx)) > 1:
+                base_clf = LogisticRegression(C=1.0, random_state=self.seed, max_iter=500, solver="lbfgs")
+                base_clf.fit(X_scaled, y_encoded)
 
-            X_calib_scaled = self.scaler.transform(calib_X)
-            y_calib_enc = self.label_encoder.transform(calib_y)
+                calib_X_filt = calib_X[valid_idx]
+                calib_y_filt = [calib_y[i] for i in valid_idx]
 
-            calibrated = CalibratedClassifierCV(estimator=base_clf, method="sigmoid", cv="prefit")
-            calibrated.fit(X_calib_scaled, y_calib_enc)
-            self.clf = calibrated
-            self.is_calibrated = True
+                X_calib_scaled = self.scaler.transform(calib_X_filt)
+                y_calib_enc = self.label_encoder.transform(calib_y_filt)
+
+                calibrated = CalibratedClassifierCV(estimator=base_clf, method="sigmoid", cv="prefit")
+                calibrated.fit(X_calib_scaled, y_calib_enc)
+                self.clf = calibrated
+                self.is_calibrated = True
+            else:
+                self.clf.fit(X_scaled, y_encoded)
         else:
             self.clf.fit(X_scaled, y_encoded)
 

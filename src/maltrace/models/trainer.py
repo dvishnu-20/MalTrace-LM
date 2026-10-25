@@ -19,7 +19,7 @@ from sklearn.metrics import (
 )
 
 from maltrace.contracts.schemas import FamilyPrediction, NormalizedEvent
-from maltrace.models.dataset_builder import load_dataset_records, split_dataset_hash_grouped, TraceSampleRecord
+from maltrace.models.dataset_builder import load_dataset_records, split_dataset_hash_grouped, split_dataset_hash_grouped_3way, TraceSampleRecord
 from maltrace.models.feature_extractor import extract_text_features, extract_structured_features, extract_single_structured_vector
 from maltrace.models.baselines import MajorityClassBaseline, TfidfBehaviorClassifier, StructuredCountClassifier
 from maltrace.representation.renderer import render_trace_statements
@@ -96,9 +96,14 @@ def train_model(
     if not records:
         raise ValueError(f"No labeled trace records found in {input_path}")
 
-    train_recs, test_recs, split_hash = split_dataset_hash_grouped(
-        records, test_ratio=0.3, seed=seed, balanced_subset=balanced_subset
+    train_recs, val_recs, test_recs, split_hash = split_dataset_hash_grouped_3way(
+        records, test_ratio=0.25, val_ratio=0.20, seed=seed, balanced_subset=balanced_subset
     )
+    if not test_recs:
+        train_recs, test_recs, split_hash = split_dataset_hash_grouped(
+            records, test_ratio=0.3, seed=seed, balanced_subset=balanced_subset
+        )
+        val_recs = []
 
     baseline_clean = baseline.lower().strip()
 
@@ -112,11 +117,12 @@ def train_model(
         train_texts = extract_text_features(train_recs)
         train_labels = [r.label for r in train_recs]
 
-        # Use test split as calibration split if available
-        test_texts = extract_text_features(test_recs)
-        test_labels = [r.label for r in test_recs]
+        # Use held-out validation split for calibration to strictly prevent test leakage
+        val_texts = extract_text_features(val_recs) if val_recs else None
+        val_labels = [r.label for r in val_recs] if val_recs else None
 
-        model.fit(train_texts, train_labels, calib_texts=test_texts, calib_y=test_labels)
+        model.fit(train_texts, train_labels, calib_texts=val_texts, calib_y=val_labels)
+        test_texts = extract_text_features(test_recs)
         y_test_pred = model.predict(test_texts)
 
     elif baseline_clean == "structured":
@@ -124,16 +130,17 @@ def train_model(
         X_train = extract_structured_features(train_recs)
         train_labels = [r.label for r in train_recs]
 
-        X_test = extract_structured_features(test_recs)
-        test_labels = [r.label for r in test_recs]
+        X_val = extract_structured_features(val_recs) if val_recs else None
+        val_labels = [r.label for r in val_recs] if val_recs else None
 
-        model.fit(X_train, train_labels, calib_X=X_test, calib_y=test_labels)
+        model.fit(X_train, train_labels, calib_X=X_val, calib_y=val_labels)
+        X_test = extract_structured_features(test_recs)
         y_test_pred = model.predict(X_test)
 
     else:
         raise ValueError(f"Unknown baseline: '{baseline}'. Expected 'majority', 'tfidf', or 'structured'.")
 
-    # Evaluate on test set (or train set if test set identical)
+    # Evaluate independently on held-out test set
     y_test_true = [r.label for r in test_recs]
     metrics = compute_metrics(y_test_true, y_test_pred, list(model.classes_))
     metrics["excluded_unknown_labels_count"] = excluded_count

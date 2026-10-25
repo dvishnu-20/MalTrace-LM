@@ -20,7 +20,10 @@ def test_end_to_end_samples(sample_filename: str, expected_family: str):
     assert result.family_prediction.family_name == expected_family
     assert result.family_prediction.confidence > 0.5
     assert len(result.behavior_claims) >= 1
-    assert len(result.technique_predictions) >= 1
+    if expected_family == "Benign.Activity":
+        assert len(result.technique_predictions) == 0
+    else:
+        assert len(result.technique_predictions) >= 1
     assert len(result.cited_evidence) >= 1
 
 

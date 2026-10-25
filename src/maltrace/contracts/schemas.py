@@ -167,6 +167,7 @@ class BatchRunManifest(BaseModel):
     total_files: int
     successful_files: int
     failed_files: int
+    total_events: int = Field(0, description="Total normalized events extracted across batch")
     files: List[IngestionFileManifest] = Field(default_factory=list)
     vocabulary_version: str = "1.0.0"
 

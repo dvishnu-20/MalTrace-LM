@@ -40,5 +40,6 @@
         "network_destination": "public"
       }
     }
-  ]
+  ],
+  "family": "Loader.QakBot"
 }

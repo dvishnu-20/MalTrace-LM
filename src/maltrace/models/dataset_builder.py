@@ -38,10 +38,14 @@ class TraceSampleRecord:
         self.behavior_text = " ".join([s.rendered_phrase for s in statements])
 
 
-def load_dataset_records(input_path: Union[str, Path]) -> Tuple[List[TraceSampleRecord], int]:
+def load_dataset_records(
+    input_path: Union[str, Path],
+    benchmark_mode: bool = True
+) -> Tuple[List[TraceSampleRecord], int]:
     """
     Scan trace files from input_path, extract events, labels, rendered statements, and SHA-256 hashes.
     Excludes samples with missing or unknown labels.
+    In benchmark_mode=True, ground truth labels are strictly extracted from report metadata.
     Returns (labeled_records, excluded_count).
     """
     in_path = Path(input_path)
@@ -60,7 +64,7 @@ def load_dataset_records(input_path: Union[str, Path]) -> Tuple[List[TraceSample
     excluded_count = 0
 
     for file_p in files:
-        gen = stream_parse_file(file_p)
+        gen = stream_parse_file(file_p, benchmark_mode=benchmark_mode)
         events: List[NormalizedEvent] = []
 
         try:
@@ -128,22 +132,18 @@ def split_dataset_hash_grouped(
     unique_hashes = sorted(list(hash_groups.keys()))
 
     # Deterministic hash ranking for train/test assignment
-    train_hashes: List[str] = []
-    test_hashes: List[str] = []
+    scored_hashes = sorted(
+        unique_hashes,
+        key=lambda h: hashlib.sha256(f"{h}:{seed}".encode("utf-8")).hexdigest()
+    )
+    n_total = len(scored_hashes)
+    n_test = max(1, int(round(n_total * test_ratio))) if n_total > 1 else 0
+    n_train = max(1, n_total - n_test)
+    if n_train + n_test > n_total:
+        n_test = max(1, n_total - n_train)
 
-    for h in unique_hashes:
-        # Pseudo-random hash score using seed
-        score_input = f"{h}:{seed}".encode("utf-8")
-        score = int(hashlib.sha256(score_input).hexdigest(), 16) % 100000 / 100000.0
-        if score < test_ratio and len(unique_hashes) > 1:
-            test_hashes.append(h)
-        else:
-            train_hashes.append(h)
-
-    # Fallback if test_hashes empty but multiple unique hashes exist
-    if not test_hashes and len(unique_hashes) > 1:
-        test_hashes = [unique_hashes[-1]]
-        train_hashes = unique_hashes[:-1]
+    train_hashes = scored_hashes[:n_train]
+    test_hashes = scored_hashes[n_train:]
 
     train_records = [r for h in train_hashes for r in hash_groups[h]]
     test_records = [r for h in test_hashes for r in hash_groups[h]]
@@ -152,3 +152,71 @@ def split_dataset_hash_grouped(
     split_hash = hashlib.sha256(split_signature.encode("utf-8")).hexdigest()[:12]
 
     return train_records, test_records, split_hash
+
+
+def split_dataset_hash_grouped_3way(
+    records: List[TraceSampleRecord],
+    test_ratio: float = 0.20,
+    val_ratio: float = 0.20,
+    seed: int = 42,
+    balanced_subset: bool = False
+) -> Tuple[List[TraceSampleRecord], List[TraceSampleRecord], List[TraceSampleRecord], str]:
+    """
+    Perform deterministic 3-way hash-grouped split into Train, Validation (Calibration), and Test sets.
+    Guarantees no identical SHA-256 hash or sample crosses splits.
+    Returns (train_records, val_records, test_records, split_hash).
+    """
+    if not records:
+        return [], [], [], "empty_split"
+
+    if balanced_subset:
+        label_map: Dict[str, List[TraceSampleRecord]] = defaultdict(list)
+        for r in records:
+            label_map[r.label].append(r)
+
+        min_count = max(1, min(len(v) for v in label_map.values())) if label_map else 0
+        subset_records: List[TraceSampleRecord] = []
+        for lbl, item_list in sorted(label_map.items()):
+            sorted_items = sorted(item_list, key=lambda x: (x.sha256, x.sample_id))
+            subset_records.extend(sorted_items[:min_count])
+        records = subset_records
+
+    hash_groups: Dict[str, List[TraceSampleRecord]] = defaultdict(list)
+    for r in records:
+        hash_groups[r.sha256].append(r)
+
+    unique_hashes = sorted(list(hash_groups.keys()))
+    scored_hashes = sorted(
+        unique_hashes,
+        key=lambda h: hashlib.sha256(f"{h}:{seed}".encode("utf-8")).hexdigest()
+    )
+    n_total = len(scored_hashes)
+
+    if n_total < 3:
+        n_test = 1 if n_total >= 2 else 0
+        n_val = 0
+        n_train = max(1, n_total - n_test)
+    else:
+        n_test = max(1, int(round(n_total * test_ratio)))
+        n_val = max(1, int(round(n_total * val_ratio)))
+        n_train = max(1, n_total - n_test - n_val)
+        while n_train + n_val + n_test > n_total:
+            if n_val > 1:
+                n_val -= 1
+            elif n_test > 1:
+                n_test -= 1
+            else:
+                break
+
+    train_hashes = scored_hashes[:n_train]
+    val_hashes = scored_hashes[n_train:n_train + n_val]
+    test_hashes = scored_hashes[n_train + n_val:]
+
+    train_records = [r for h in train_hashes for r in hash_groups[h]]
+    val_records = [r for h in val_hashes for r in hash_groups[h]]
+    test_records = [r for h in test_hashes for r in hash_groups[h]]
+
+    split_signature = f"seed={seed}:train={sorted(train_hashes)}:val={sorted(val_hashes)}:test={sorted(test_hashes)}"
+    split_hash = hashlib.sha256(split_signature.encode("utf-8")).hexdigest()[:12]
+
+    return train_records, val_records, test_records, split_hash

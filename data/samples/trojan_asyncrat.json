@@ -39,5 +39,6 @@
         "protocol": "TCP"
       }
     }
-  ]
+  ],
+  "family": "Trojan.AsyncRAT"
 }

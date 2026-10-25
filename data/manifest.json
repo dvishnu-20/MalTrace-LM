@@ -1,0 +1,86 @@
+{
+  "manifest_version": "1.0.0",
+  "freeze_date": "2026-10-25T00:00:00Z",
+  "total_samples": 11,
+  "samples": {
+    "benign_notepad.json": {
+      "sample_id": "benign_notepad_01",
+      "sha256": "d109b24c0ee2a825452bad4a495b88e24b743b31464cd96a645fee4d197ba553",
+      "family": "Benign.Activity",
+      "event_count": 3,
+      "file_size_bytes": 1198
+    },
+    "coinminer_xmrig.json": {
+      "sample_id": "coinminer_xmrig_01",
+      "sha256": "f7d270cb5bdb9f68fa6bca033ac4d2643cb9cca4c469a17179b647afd7559ab1",
+      "family": "Coinminer.XMRig",
+      "event_count": 2,
+      "file_size_bytes": 871
+    },
+    "dropper_emotet.json": {
+      "sample_id": "dropper_emotet_01",
+      "sha256": "7d6eb21cae1db24fb52b39c640e1b9e55f4e36586302ce142d9a4d5d73537d2b",
+      "family": "Dropper.Emotet",
+      "event_count": 3,
+      "file_size_bytes": 1374
+    },
+    "example.json": {
+      "sample_id": "example_trace_01",
+      "sha256": "101e1a82432718f90a7265c9450df3d4bf742f67e38a2c57d070b64aa673e2de",
+      "family": "Ransomware.WannaCry",
+      "event_count": 3,
+      "file_size_bytes": 1185
+    },
+    "infostealer_agenttesla.json": {
+      "sample_id": "infostealer_agenttesla_01",
+      "sha256": "f4f8fa15359972d1dd37af2984fffda093634e56d851eace6d59deabca8eb0b8",
+      "family": "Stealer.AgentTesla",
+      "event_count": 3,
+      "file_size_bytes": 1155
+    },
+    "infostealer_redline.json": {
+      "sample_id": "infostealer_redline_01",
+      "sha256": "c3efe8b7fb3a46372c67ea2674611c50a7298297aa44cfaa0b7ec4cd6c7df67e",
+      "family": "Stealer.RedLine",
+      "event_count": 3,
+      "file_size_bytes": 1193
+    },
+    "loader_qakbot.json": {
+      "sample_id": "loader_qakbot_01",
+      "sha256": "657341f7ddb19517fa11fd8dd5ca61f632844877b3e2659e3b2d584f4cef7b35",
+      "family": "Loader.QakBot",
+      "event_count": 3,
+      "file_size_bytes": 1237
+    },
+    "ransomware_lockbit.json": {
+      "sample_id": "ransomware_lockbit_01",
+      "sha256": "cb43c27997eb25a4ce4394e489de95330831cf7951f2a6dd2132af926864ffa8",
+      "family": "Ransomware.LockBit",
+      "event_count": 4,
+      "file_size_bytes": 1564
+    },
+    "ransomware_wannacry.json": {
+      "sample_id": "ransomware_wannacry_01",
+      "sha256": "3420bc20e2ad4e4ce98656fb0954acae59f5a58b5a5041f3d75a01f4d4572b4e",
+      "family": "Ransomware.WannaCry",
+      "event_count": 3,
+      "file_size_bytes": 1191
+    },
+    "trojan_asyncrat.json": {
+      "sample_id": "trojan_asyncrat_01",
+      "sha256": "2fcb62263c92fcbf8a8ebf14d7b36d309d744b0f00b8d1a2825ede52facbeee2",
+      "family": "Trojan.AsyncRAT",
+      "event_count": 3,
+      "file_size_bytes": 1303
+    },
+    "wiper_hermetic.json": {
+      "sample_id": "wiper_hermetic_01",
+      "sha256": "0159880e5978282da13d9ffba4e15cfcaa9358c38f5a6d8b56927a4494bf7b0d",
+      "family": "Wiper.HermeticWiper",
+      "event_count": 3,
+      "file_size_bytes": 1229
+    }
+  },
+  "citation": "MalTrace-LM: Explainable Dynamic Trace Representation and Behavioral Grounding",
+  "disclaimer": "Defensive evaluation dataset only. Contains benign representations and synthetic behavioral traces."
+}

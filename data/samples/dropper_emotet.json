@@ -37,5 +37,6 @@
         "bytes_written": 154200
       }
     }
-  ]
+  ],
+  "family": "Dropper.Emotet"
 }

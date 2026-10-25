@@ -22,12 +22,63 @@ from maltrace.reporting.llm_provider import BaseLLMProvider, DisabledLLMProvider
 TECHNIQUE_ID_REGEX = re.compile(r"\bT\d{4}(?:\.\d{3})?\b")
 
 
+SEMANTIC_CHECK_RULES: List[Dict[str, Any]] = [
+    {
+        "name": "Process Injection",
+        "claim_patterns": [r"\binject(?:ion|ed)?\b", r"\bcreateremotethread\b", r"\bprocess hollowing\b", r"\bwriteprocessmemory\b"],
+        "required_categories": {"process", "memory"},
+        "required_evidence_patterns": [r"createremotethread", r"writeprocessmemory", r"virtualallocex", r"queueuserapc", r"ntunmapviewofsection", r"inject"]
+    },
+    {
+        "name": "Shadow Copy Deletion / Defense Impairment",
+        "claim_patterns": [r"\bvssadmin\b", r"\bshadow copy\b", r"\bdelete shadows\b", r"\brecoveryenabled\b"],
+        "required_categories": {"process", "file"},
+        "required_evidence_patterns": [r"vssadmin", r"shadow", r"delete", r"bcdedit", r"wbadmin", r"recovery"]
+    },
+    {
+        "name": "File Encryption / Ransom Impact",
+        "claim_patterns": [r"\bencrypt(?:ion|ed)?\b", r"\bransom note\b", r"\b\.wncry\b", r"\b\.lockbit\b", r"\b\.locked\b"],
+        "required_categories": {"file"},
+        "required_evidence_patterns": [r"encrypt", r"ransom", r"decrypt", r"\.locked", r"\.wncry", r"\.lockbit", r"readme", r"writefile", r"ntwritefile", r"setinformationfile"]
+    },
+    {
+        "name": "Registry Persistence",
+        "claim_patterns": [r"\bautostart\b", r"\brun key\b", r"\brunonce\b", r"\bregistry persistence\b"],
+        "required_categories": {"registry"},
+        "required_evidence_patterns": [r"run", r"runonce", r"currentversion", r"startup", r"regsetvalue", r"registry"]
+    },
+    {
+        "name": "Credential Access / LSASS",
+        "claim_patterns": [r"\blsass\b", r"\bcredential theft\b", r"\bdump credentials\b", r"\bsam database\b", r"\bkeylogger\b", r"\bkeystroke\b"],
+        "required_categories": {"process", "file", "registry", "memory"},
+        "required_evidence_patterns": [r"lsass", r"sam", r"logindata", r"passwords", r"vault", r"keylog", r"getasynckeystate", r"setwindowshookex"]
+    },
+    {
+        "name": "Command and Control / Network Exfiltration",
+        "claim_patterns": [r"\bc2\b", r"\bcommand and control\b", r"\bexfiltrat(?:e|ion|ed)\b", r"\boutbound network\b", r"\bbeacon(?:ing)?\b"],
+        "required_categories": {"network"},
+        "required_evidence_patterns": [r"network", r"connect", r"socket", r"httpsendrequest", r"internetopenurl", r"http", r"tcp", r"dns", r"ip"]
+    },
+    {
+        "name": "Service Manipulation",
+        "claim_patterns": [r"\bcreateservice\b", r"\binstall(?:ed)? service\b", r"\bservice creation\b"],
+        "required_categories": {"service"},
+        "required_evidence_patterns": [r"service", r"createservice", r"startservice", r"sc\.exe"]
+    }
+]
+
+
 def validate_llm_response(
     response: LLMReportResponse,
     result: AnalysisResult
 ) -> Tuple[bool, List[str]]:
     """
     Validate LLM response against result facts.
+    Verifies:
+      1. All cited event IDs exist in the analysis result cited evidence.
+      2. All ATT&CK technique IDs mentioned in LLM text were mapped and verified.
+      3. Semantic entailment: specific behavioral claims in the LLM output are substantiated
+         by matching categories and operational indicators in cited evidence.
     Returns (is_valid, list_of_warning_messages).
     """
     warnings: List[str] = []
@@ -56,6 +107,25 @@ def validate_llm_response(
     for tid in mentioned_tids:
         if tid not in valid_tids:
             warnings.append(f"Grounding failure: LLM mentioned unmapped technique_id '{tid}'.")
+
+    # 3. Claim-to-Evidence Semantic Entailment Check
+    evidence_by_id = {ev.event_id: ev for ev in result.cited_evidence}
+    cited_events = [evidence_by_id[eid] for eid in response.cited_event_ids if eid in evidence_by_id]
+    cited_categories = {ev.category.lower() for ev in cited_events}
+    cited_snippets_text = " ".join([f"{ev.api_name} {ev.snippet}".lower() for ev in cited_events])
+
+    for claim in response.behavior_claims:
+        claim_lower = claim.lower()
+        for rule in SEMANTIC_CHECK_RULES:
+            if any(re.search(pat, claim_lower) for pat in rule["claim_patterns"]):
+                cat_match = bool(cited_categories.intersection(rule["required_categories"]))
+                evidence_match = any(re.search(pat, cited_snippets_text) for pat in rule["required_evidence_patterns"])
+
+                if not (cat_match and evidence_match):
+                    warnings.append(
+                        f"Semantic grounding failure: Claim asserts '{rule['name']}' ('{claim}') "
+                        f"but cited events provide no supporting evidence matching {rule['required_categories']} or action indicators."
+                    )
 
     is_valid = len(warnings) == 0
     return is_valid, warnings

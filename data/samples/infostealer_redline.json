@@ -38,5 +38,6 @@
         "protocol": "HTTP_POST"
       }
     }
-  ]
+  ],
+  "family": "Stealer.RedLine"
 }

@@ -32,20 +32,4 @@ def map_behavior_to_attack(
             predictions.append(pred)
             seen_tids.add(pred.technique_id)
 
-    # Benign fallback if no threat technique matched
-    if not predictions and events:
-        predictions.append(
-            TechniquePrediction(
-                technique_id="T1005",
-                technique_name="Data from Local System (Standard Read)",
-                tactic="Collection",
-                confidence=0.50,
-                confidence_label="Needs Review",
-                supporting_evidence_ids=[events[0].event_id],
-                matched_rules=["FALLBACK_BENIGN_READ_EVENT"],
-                explanation="No malicious ATT&CK technique pattern triggered. Standard local system activity observed.",
-                needs_review=True
-            )
-        )
-
     return predictions

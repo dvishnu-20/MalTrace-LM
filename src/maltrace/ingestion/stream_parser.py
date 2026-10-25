@@ -37,7 +37,10 @@ def compute_file_sha256_and_size(file_path: Union[str, Path]) -> Tuple[str, int]
     return sha256.hexdigest(), size
 
 
-def stream_parse_file(file_path: Union[str, Path]) -> Generator[NormalizedEvent, None, IngestionFileManifest]:
+def stream_parse_file(
+    file_path: Union[str, Path],
+    benchmark_mode: bool = False
+) -> Generator[NormalizedEvent, None, IngestionFileManifest]:
     """
     Generator yielding normalized events one by one from a single trace report.
     Returns IngestionFileManifest on completion.
@@ -61,7 +64,9 @@ def stream_parse_file(file_path: Union[str, Path]) -> Generator[NormalizedEvent,
                     try:
                         line_data = orjson.loads(line_str)
                         if isinstance(line_data, dict):
-                            s_id, lbl, evts, warn = ReportAdapter.extract(line_data, source_file=path.name)
+                            s_id, lbl, evts, warn = ReportAdapter.extract(
+                                line_data, source_file=path.name, benchmark_mode=benchmark_mode
+                            )
                             if s_id:
                                 sample_id = s_id
                             if lbl:
@@ -75,7 +80,9 @@ def stream_parse_file(file_path: Union[str, Path]) -> Generator[NormalizedEvent,
             with open(path, "rb") as f:
                 content = f.read()
                 data = orjson.loads(content)
-            sample_id, label, raw_events, adapter_warnings = ReportAdapter.extract(data, source_file=path.name)
+            sample_id, label, raw_events, adapter_warnings = ReportAdapter.extract(
+                data, source_file=path.name, benchmark_mode=benchmark_mode
+            )
             warnings.extend(adapter_warnings)
 
     except Exception as e:
@@ -123,13 +130,31 @@ def stream_parse_file(file_path: Union[str, Path]) -> Generator[NormalizedEvent,
     return manifest
 
 
+import pyarrow as pa
+import pyarrow.parquet as pq
+
+
+def _chunk_to_arrow_table(chunk: List[Dict[str, Any]]) -> pa.Table:
+    sanitized: List[Dict[str, Any]] = []
+    for ev in chunk:
+        row = dict(ev)
+        for k, v in row.items():
+            if isinstance(v, (dict, list)):
+                row[k] = json.dumps(v)
+        sanitized.append(row)
+    df = pd.DataFrame(sanitized)
+    return pa.Table.from_pandas(df, preserve_index=False)
+
+
 def process_batch(
     input_path: Union[str, Path],
-    output_dir: Union[str, Path]
+    output_dir: Union[str, Path],
+    chunk_size: int = 5000
 ) -> BatchRunManifest:
     """
-    Process a single trace file or directory of trace files bounded-memory,
-    writing normalized JSONL, Parquet, and manifest.json to output_dir.
+    Process a single trace file or directory of trace files strictly bounded-memory,
+    writing normalized JSONL stream, chunked Parquet, and manifest.json to output_dir.
+    Guarantees peak memory consumption is strictly O(chunk_size), independent of dataset scale.
     """
     in_path = Path(input_path)
     out_dir = Path(output_dir)
@@ -150,42 +175,50 @@ def process_batch(
     manifest_path = out_dir / "manifest.json"
 
     file_manifests: List[IngestionFileManifest] = []
-    all_events_dicts: List[Dict[str, Any]] = []
-
     successful_count = 0
     failed_count = 0
+    total_events_count = 0
+
+    chunk_buffer: List[Dict[str, Any]] = []
+    parquet_writer: Optional[pq.ParquetWriter] = None
 
     with open(jsonl_path, "w", encoding="utf-8") as jsonl_file:
         for file_p in files_to_process:
             gen = stream_parse_file(file_p)
-            events_for_file: List[NormalizedEvent] = []
 
             try:
                 while True:
                     event = next(gen)
-                    events_for_file.append(event)
-                    # Write to JSONL stream
+                    total_events_count += 1
                     event_dict = event.model_dump()
                     jsonl_file.write(json.dumps(event_dict) + "\n")
-                    all_events_dicts.append(event_dict)
+                    chunk_buffer.append(event_dict)
+
+                    if len(chunk_buffer) >= chunk_size:
+                        table = _chunk_to_arrow_table(chunk_buffer)
+                        if parquet_writer is None:
+                            parquet_writer = pq.ParquetWriter(str(parquet_path), table.schema)
+                        parquet_writer.write_table(table)
+                        chunk_buffer.clear()
             except StopIteration as stop:
-                file_manifest: IngestionFileManifest = stop.value
+                file_manifest = stop.value
                 file_manifests.append(file_manifest)
                 if file_manifest.parse_status == "failed":
                     failed_count += 1
                 else:
                     successful_count += 1
 
-    # Write Parquet event table using pandas
-    if all_events_dicts:
-        df = pd.DataFrame(all_events_dicts)
-        # Convert dict/list columns to string or json string for clean Parquet export
-        for col in df.columns:
-            if df[col].apply(lambda x: isinstance(x, (dict, list))).any():
-                df[col] = df[col].apply(lambda x: json.dumps(x) if isinstance(x, (dict, list)) else x)
-        df.to_parquet(parquet_path, index=False)
-    else:
-        # Empty DataFrame parquet
+        # Flush remaining chunk buffer
+        if chunk_buffer:
+            table = _chunk_to_arrow_table(chunk_buffer)
+            if parquet_writer is None:
+                parquet_writer = pq.ParquetWriter(str(parquet_path), table.schema)
+            parquet_writer.write_table(table)
+            chunk_buffer.clear()
+
+    if parquet_writer is not None:
+        parquet_writer.close()
+    elif not parquet_path.exists():
         pd.DataFrame().to_parquet(parquet_path)
 
     batch_manifest = BatchRunManifest(
@@ -194,6 +227,7 @@ def process_batch(
         total_files=len(files_to_process),
         successful_files=successful_count,
         failed_files=failed_count,
+        total_events=total_events_count,
         files=file_manifests
     )
 

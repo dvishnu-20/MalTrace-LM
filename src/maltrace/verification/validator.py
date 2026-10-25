@@ -170,7 +170,7 @@ class EvidenceVerifier:
             updated_family = family_pred.model_copy(update={
                 "family_name": "Abstained",
                 "confidence_label": band_label,
-                "rule_triggered": f"ABSTAINED: {final_abstention_reason}",
+                "rule_triggered": f"ABSTAINED: {final_abstention_reason} [Original rule: {family_pred.rule_triggered}]",
                 "supporting_evidence_ids": valid_fam_eids
             })
         else:

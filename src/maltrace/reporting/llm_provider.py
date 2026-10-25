@@ -264,6 +264,14 @@ class MockLLMProvider(BaseLLMProvider):
                 "uncertainty_statement": "Trace bounds apply.",
                 "analyst_notes": "Verify host memory."
             }
+        elif self.mode == "semantic_hallucination":
+            resp_dict = {
+                "summary": f"LLM summary for {request.sample_id}",
+                "behavior_claims": ["Malware executed process injection via CreateRemoteThread into svchost.exe"],
+                "cited_event_ids": request.cited_event_ids[:1],  # Valid ID, but semantically contradictory/unsupported
+                "uncertainty_statement": "Trace bounds apply.",
+                "analyst_notes": "Verify host memory."
+            }
         else:  # valid
             resp_dict = self.response_override or {
                 "summary": f"LLM enhanced executive summary for trace sample '{request.sample_id}'. The host displayed activity consistent with '{request.predicted_family}'.",

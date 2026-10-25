@@ -26,5 +26,6 @@
         "protocol": "STRATUM_TCP"
       }
     }
-  ]
+  ],
+  "family": "Coinminer.XMRig"
 }

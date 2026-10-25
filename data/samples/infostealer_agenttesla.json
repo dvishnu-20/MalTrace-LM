@@ -38,5 +38,6 @@
         "network_destination": "public"
       }
     }
-  ]
+  ],
+  "family": "Stealer.AgentTesla"
 }

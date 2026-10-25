@@ -134,3 +134,17 @@ def test_acceptance_gate_no_llm_configured_default():
     report_default = build_analyst_report(result, llm_provider=None)
     assert report_default.generation_mode == "deterministic"
     assert report_default.manifest.validation_status == "disabled"
+
+
+def test_mock_llm_semantic_hallucination_fallback():
+    sample_path = Path("data/samples/ransomware_wannacry.json")
+    result = analyze_trace(sample_path)
+
+    mock_provider = MockLLMProvider(mode="semantic_hallucination")
+    report = build_analyst_report(result, llm_provider=mock_provider)
+
+    # Must safely discard hallucinated claim and return deterministic fallback
+    assert report.generation_mode == "deterministic"
+    assert report.manifest is not None
+    assert report.manifest.validation_status == "failed"
+    assert any("semantic grounding failure" in w.lower() for w in report.manifest.validation_warnings)

@@ -39,9 +39,14 @@ class ReportAdapter:
     """
 
     @staticmethod
-    def extract(data: Any, source_file: str = "unknown.json") -> Tuple[str, Optional[str], List[RawEvent], List[str]]:
+    def extract(
+        data: Any,
+        source_file: str = "unknown.json",
+        benchmark_mode: bool = False
+    ) -> Tuple[str, Optional[str], List[RawEvent], List[str]]:
         """
         Extract sample_id, label, list of RawEvent, and list of warning strings from report data.
+        In benchmark_mode=True, filename-based label inference is strictly disabled.
         """
         warnings: List[str] = []
         raw_events: List[RawEvent] = []
@@ -84,8 +89,8 @@ class ReportAdapter:
         elif "info" in data and isinstance(data["info"], dict) and "family" in data["info"]:
             label = str(data["info"]["family"])
 
-        # Infer label from filename or sample_id if missing in dict
-        if not label:
+        # Filename inference is strictly forbidden in benchmark mode to preserve scientific evaluation integrity
+        if not label and not benchmark_mode:
             sid_lower = (sample_id + "_" + Path(source_file).stem).lower()
             if "wannacry" in sid_lower or "ransomware" in sid_lower:
                 label = "Ransomware.WannaCry"

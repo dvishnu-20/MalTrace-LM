@@ -1,0 +1,39 @@
+name: MalTrace-LM CI & Scientific Reproducibility Gate
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  test:
+    name: Test & Verify Suite (${{ matrix.os }}, Python ${{ matrix.python-version }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+        python-version: ["3.10", "3.11"]
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: "pip"
+
+      - name: Upgrade Pip & Install Build Tools
+        run: |
+          python -m pip install --upgrade pip setuptools wheel
+
+      - name: Install Dependencies & Package
+        run: |
+          pip install -e .
+
+      - name: Run Pytest Test Suite
+        run: |
+          pytest tests/ -v --tb=short

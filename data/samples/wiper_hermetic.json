@@ -38,5 +38,6 @@
         "command_line": "shutdown.exe /r /f /t 0"
       }
     }
-  ]
+  ],
+  "family": "Wiper.HermeticWiper"
 }

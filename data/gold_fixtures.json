@@ -3,7 +3,7 @@
   "samples": {
     "ransomware_wannacry.json": {
       "sample_id": "ransomware_wannacry_01",
-      "expected_techniques": ["T1486"]
+      "expected_techniques": ["T1486", "T1490"]
     },
     "infostealer_redline.json": {
       "sample_id": "infostealer_redline_01",
@@ -23,7 +23,7 @@
     },
     "benign_notepad.json": {
       "sample_id": "benign_notepad_01",
-      "expected_techniques": ["T1005"]
+      "expected_techniques": []
     }
   }
 }

@@ -222,10 +222,106 @@ class SequenceInferenceEngine:
         }
 
 
-def build_default_sequence_engine() -> SequenceInferenceEngine:
+def train_sequence_model(
+    records: List[Any],
+    output_path: Union[str, Path] = "models/sequence_model/bilstm_attention.pt",
+    epochs: int = 15,
+    lr: float = 0.005,
+    seed: int = 42
+) -> str:
     """
-    Factory function creating an initialized sequence model with canonical vocabulary.
+    Train PyTorch BiLSTM with Self-Attention on execution trace sequences and save weights.
     """
+    import torch.optim as optim
+    torch.manual_seed(seed)
+    np.random.seed(seed)
+
+    label_map = {
+        0: "Benign.Activity",
+        1: "Ransomware.Generic",
+        2: "Stealer.Generic",
+        3: "Trojan.Generic",
+        4: "Dropper.Generic",
+        5: "Wiper.Generic"
+    }
+    inv_label_map = {v: k for k, v in label_map.items()}
+
+    # Build tokenizer vocabulary from records
+    tok = APISequenceTokenizer()
+    tok.fit_on_traces([rec.events for rec in records])
+
+    model = APISequenceBiLSTM(
+        vocab_size=len(tok.vocab) + 10,
+        num_classes=len(label_map),
+        embed_dim=32,
+        hidden_dim=64,
+        num_layers=1,
+        dropout=0.1
+    )
+    optimizer = optim.Adam(model.parameters(), lr=lr)
+    criterion = nn.CrossEntropyLoss()
+
+    model.train()
+    for epoch in range(epochs):
+        for rec in records:
+            lbl_idx = 0
+            if rec.label:
+                for k, v in inv_label_map.items():
+                    if k.split(".")[0].lower() in rec.label.lower():
+                        lbl_idx = v
+                        break
+
+            tensor_seq, _ = tok.tokenize(rec.events, max_length=128)
+            tensor_batch = tensor_seq.unsqueeze(0)
+            target = torch.tensor([lbl_idx], dtype=torch.long)
+
+            optimizer.zero_grad()
+            logits, _ = model(tensor_batch)
+            loss = criterion(logits, target)
+            loss.backward()
+            optimizer.step()
+
+    out_p = Path(output_path)
+    out_p.parent.mkdir(parents=True, exist_ok=True)
+    torch.save({
+        "model_state_dict": model.state_dict(),
+        "vocab": tok.vocab,
+        "label_map": label_map
+    }, str(out_p))
+
+    return str(out_p)
+
+
+def build_default_sequence_engine(
+    weights_path: Optional[Union[str, Path]] = None
+) -> SequenceInferenceEngine:
+    """
+    Factory function creating an initialized sequence model with canonical vocabulary
+    and loading trained weights if available.
+    """
+    default_p = Path("models/sequence_model/bilstm_attention.pt")
+    target_path = Path(weights_path) if weights_path else (default_p if default_p.exists() else None)
+
+    if target_path and target_path.exists():
+        checkpoint = torch.load(str(target_path), map_location="cpu")
+        tok = APISequenceTokenizer()
+        tok.vocab = checkpoint.get("vocab", {})
+        tok.inv_vocab = {v: k for k, v in tok.vocab.items()}
+        label_map = checkpoint.get("label_map", {0: "Benign.Activity", 1: "Threat.Generic"})
+
+        model = APISequenceBiLSTM(
+            vocab_size=len(tok.vocab) + 10,
+            num_classes=len(label_map),
+            embed_dim=32,
+            hidden_dim=64,
+            num_layers=1,
+            dropout=0.1
+        )
+        model.load_state_dict(checkpoint["model_state_dict"])
+        model.eval()
+        return SequenceInferenceEngine(model, tok, label_map)
+
+    # Fallback with canonical vocabulary
     common_apis = [
         "process::createprocess", "process::createprocessinternalw", "process::winexec",
         "file::ntcreatefile", "file::writefile", "file::readfile", "file::deletefilew",

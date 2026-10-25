@@ -95,7 +95,7 @@
       "severity_hint": "critical",
       "required_fields": ["process_id"],
       "optional_fields": ["command_line", "target_path"],
-      "candidate_attack_techniques": ["T1486", "T1562.001"]
+      "candidate_attack_techniques": ["T1490", "T1562.001"]
     }
   }
 }

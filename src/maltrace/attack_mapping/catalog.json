@@ -340,7 +340,7 @@
       "technique_name": "Data Encrypted for Impact",
       "tactic": "Impact",
       "description": "Adversaries may encrypt data on target systems to interrupt availability.",
-      "required_evidence_patterns": ["vssadmin", ".locked", ".wncry", "decrypt_ransom", "ransom", ".lockbit", "restore-my-files"],
+      "required_evidence_patterns": [".locked", ".wncry", "decrypt_ransom", "ransom", ".lockbit", "restore-my-files"],
       "optional_supporting_patterns": ["ransom_note"],
       "exclusion_rules": ["normal_file_lock"]
     },
@@ -358,7 +358,7 @@
       "technique_name": "Inhibit System Recovery",
       "tactic": "Impact",
       "description": "Adversaries may delete or remove built-in data recovery systems like shadow copies.",
-      "required_evidence_patterns": ["recoveryenabled no", "wbadmin delete catalog"],
+      "required_evidence_patterns": ["vssadmin", "delete shadows", "recoveryenabled no", "wbadmin delete catalog"],
       "optional_supporting_patterns": ["bcdedit", "shadowcopy"],
       "exclusion_rules": ["bcdedit /enum"]
     },
