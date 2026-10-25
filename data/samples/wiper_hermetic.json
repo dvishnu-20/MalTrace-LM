@@ -1,0 +1,42 @@
+{
+  "sample_id": "wiper_hermetic_01",
+  "events": [
+    {
+      "event_id": "evt_wp_01",
+      "event_order": 1,
+      "process_id": 8100,
+      "parent_process_id": 900,
+      "timestamp": "2026-08-04T22:30:00Z",
+      "api_name": "CreateFileW",
+      "arguments": {
+        "target_path": "\\\\.\\PhysicalDrive0",
+        "desired_access": "GENERIC_READ | GENERIC_WRITE",
+        "creation_disposition": "OPEN_EXISTING"
+      }
+    },
+    {
+      "event_id": "evt_wp_02",
+      "event_order": 2,
+      "process_id": 8100,
+      "parent_process_id": 900,
+      "timestamp": "2026-08-04T22:30:02Z",
+      "api_name": "DeviceIoControl",
+      "arguments": {
+        "control_code": "IOCTL_DISK_GET_DRIVE_LAYOUT_EX",
+        "description": "rawdisk sector overwrite hermetic wiper"
+      }
+    },
+    {
+      "event_id": "evt_wp_03",
+      "event_order": 3,
+      "process_id": 8100,
+      "parent_process_id": 900,
+      "timestamp": "2026-08-04T22:30:05Z",
+      "api_name": "CreateProcessInternalW",
+      "arguments": {
+        "image_name": "C:\\Windows\\System32\\shutdown.exe",
+        "command_line": "shutdown.exe /r /f /t 0"
+      }
+    }
+  ]
+}

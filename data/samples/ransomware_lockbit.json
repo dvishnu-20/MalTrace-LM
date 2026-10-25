@@ -1,0 +1,53 @@
+{
+  "sample_id": "ransomware_lockbit_01",
+  "events": [
+    {
+      "event_id": "evt_lb_01",
+      "event_order": 1,
+      "process_id": 5210,
+      "parent_process_id": 1400,
+      "timestamp": "2026-08-01T04:20:00Z",
+      "api_name": "CreateProcessInternalW",
+      "arguments": {
+        "image_name": "C:\\Windows\\System32\\vssadmin.exe",
+        "command_line": "vssadmin.exe delete shadows /all /quiet"
+      }
+    },
+    {
+      "event_id": "evt_lb_02",
+      "event_order": 2,
+      "process_id": 5210,
+      "parent_process_id": 1400,
+      "timestamp": "2026-08-01T04:20:02Z",
+      "api_name": "CreateProcessInternalW",
+      "arguments": {
+        "image_name": "C:\\Windows\\System32\\bcdedit.exe",
+        "command_line": "bcdedit /set {default} recoveryenabled No"
+      }
+    },
+    {
+      "event_id": "evt_lb_03",
+      "event_order": 3,
+      "process_id": 5210,
+      "parent_process_id": 1400,
+      "timestamp": "2026-08-01T04:20:05Z",
+      "api_name": "WriteFile",
+      "arguments": {
+        "target_path": "C:\\Users\\Victim\\Documents\\contracts.xlsx.lockbit",
+        "bytes_written": 512000
+      }
+    },
+    {
+      "event_id": "evt_lb_04",
+      "event_order": 4,
+      "process_id": 5210,
+      "parent_process_id": 1400,
+      "timestamp": "2026-08-01T04:20:07Z",
+      "api_name": "WriteFile",
+      "arguments": {
+        "target_path": "C:\\Users\\Victim\\Desktop\\Restore-My-Files.txt",
+        "bytes_written": 2048
+      }
+    }
+  ]
+}

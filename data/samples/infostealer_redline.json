@@ -1,0 +1,42 @@
+{
+  "sample_id": "infostealer_redline_01",
+  "events": [
+    {
+      "event_id": "evt_2001",
+      "event_order": 1,
+      "process_id": 5512,
+      "parent_process_id": 2040,
+      "timestamp": "2026-07-28T10:20:00Z",
+      "api_name": "NtCreateFile",
+      "arguments": {
+        "target_path": "C:\\Users\\Victim\\AppData\\Local\\Google\\Chrome\\User Data\\Default\\LoginData",
+        "desired_access": "GENERIC_READ"
+      }
+    },
+    {
+      "event_id": "evt_2002",
+      "event_order": 2,
+      "process_id": 5512,
+      "parent_process_id": 2040,
+      "timestamp": "2026-07-28T10:20:02Z",
+      "api_name": "WriteFile",
+      "arguments": {
+        "target_path": "C:\\Users\\Victim\\AppData\\Local\\Temp\\passwords.txt",
+        "bytes_written": 4096
+      }
+    },
+    {
+      "event_id": "evt_2003",
+      "event_order": 3,
+      "process_id": 5512,
+      "parent_process_id": 2040,
+      "timestamp": "2026-07-28T10:20:05Z",
+      "api_name": "WSAConnect",
+      "arguments": {
+        "destination_ip": "198.51.100.45",
+        "destination_port": 8080,
+        "protocol": "HTTP_POST"
+      }
+    }
+  ]
+}

@@ -1,0 +1,31 @@
+======================================================================
+MalTrace-LM Controlled Behavior Report - Sample: coinminer_xmrig_01
+======================================================================
+Root Processes: [9210]
+Child Processes: [9500]
+Major Category Counts: {'service': 1, 'network': 1}
+----------------------------------------------------------------------
+
+[SECURITY ANCHORS]
+  - [evt_5001] (PID 9210) (UnusualServiceCreation) Process proc_9210.exe (PID 9210) created or modified Windows service WinSysUpdateSvc executing binary C:\ProgramData\xmrig\xmrig_miner.exe --url=stratum+tcp://xmr-pool-example.org:3333 --user=48ed... --pass=x.
+  - [evt_5002] (PID 9500) (PublicOutboundConnection) Process proc_9500.exe (PID 9500) initiated outbound network connection to 198.51.100.99:3333 (private) via protocol STRATUM_TCP.
+
+[PROCESS BEHAVIOR SUMMARIES]
+
+--- Process: proc_9210.exe (PID 9210) ---
+  Lineage Path: proc_9210.exe (9210)
+  Parent Relationship: Root Process (No Parent)
+  Event Category Counts: {'service': 1}
+  High-Value Actions: ['UnusualServiceCreation', 'Process proc_9210.exe (PID 9210) created or modified Windows service WinSysUpdateSvc executing binar']
+  Behavior Statements:
+    * [evt_5001 | Order 1] [UnusualServiceCreation] Process proc_9210.exe (PID 9210) created or modified Windows service WinSysUpdateSvc executing binary C:\ProgramData\xmrig\xmrig_miner.exe --url=stratum+tcp://xmr-pool-example.org:3333 --user=48ed... --pass=x.
+
+--- Process: proc_9500.exe (PID 9500) ---
+  Lineage Path: proc_9210.exe (9210) -> proc_9500.exe (9500)
+  Parent Relationship: Child of proc_9210.exe (PID 9210)
+  Event Category Counts: {'network': 1}
+  High-Value Actions: ['PublicOutboundConnection']
+  Behavior Statements:
+    * [evt_5002 | Order 2] [PublicOutboundConnection] Process proc_9500.exe (PID 9500) initiated outbound network connection to 198.51.100.99:3333 (private) via protocol STRATUM_TCP.
+
+======================================================================

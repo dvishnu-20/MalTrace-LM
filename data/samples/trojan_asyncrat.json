@@ -1,0 +1,43 @@
+{
+  "sample_id": "trojan_asyncrat_01",
+  "events": [
+    {
+      "event_id": "evt_3001",
+      "event_order": 1,
+      "process_id": 6120,
+      "parent_process_id": 1100,
+      "timestamp": "2026-07-28T10:30:00Z",
+      "api_name": "RegSetValueExW",
+      "arguments": {
+        "registry_key": "HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Run",
+        "value_name": "AsyncClient",
+        "value_data": "C:\\Users\\Public\\async_client.exe"
+      }
+    },
+    {
+      "event_id": "evt_3002",
+      "event_order": 2,
+      "process_id": 6120,
+      "parent_process_id": 1100,
+      "timestamp": "2026-07-28T10:30:02Z",
+      "api_name": "CreateProcessInternalW",
+      "arguments": {
+        "image_name": "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe",
+        "command_line": "powershell.exe -ExecutionPolicy Bypass -NoProfile -WindowStyle Hidden"
+      }
+    },
+    {
+      "event_id": "evt_3003",
+      "event_order": 3,
+      "process_id": 6120,
+      "parent_process_id": 1100,
+      "timestamp": "2026-07-28T10:30:05Z",
+      "api_name": "WSAConnect",
+      "arguments": {
+        "destination_ip": "203.0.113.12",
+        "destination_port": 6606,
+        "protocol": "TCP"
+      }
+    }
+  ]
+}

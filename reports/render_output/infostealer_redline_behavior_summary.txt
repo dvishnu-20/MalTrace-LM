@@ -1,0 +1,24 @@
+======================================================================
+MalTrace-LM Controlled Behavior Report - Sample: infostealer_redline_01
+======================================================================
+Root Processes: [5512]
+Child Processes: []
+Major Category Counts: {'file': 2, 'network': 1}
+----------------------------------------------------------------------
+
+[SECURITY ANCHORS]
+  - [evt_2003] (PID 5512) (PublicOutboundConnection) Process proc_5512.exe (PID 5512) initiated outbound network connection to 198.51.100.45:8080 (private) via protocol HTTP_POST.
+
+[PROCESS BEHAVIOR SUMMARIES]
+
+--- Process: LoginData (PID 5512) ---
+  Lineage Path: LoginData (5512)
+  Parent Relationship: Root Process (No Parent)
+  Event Category Counts: {'file': 2, 'network': 1}
+  High-Value Actions: ['Process proc_5512.exe (PID 5512) accessed credential vault or password store at path C:\\Users\\<USER>', 'Process proc_5512.exe (PID 5512) accessed credential vault or password store at path C:\\Users\\<USER>', 'PublicOutboundConnection']
+  Behavior Statements:
+    * [evt_2001 | Order 1] Process proc_5512.exe (PID 5512) accessed credential vault or password store at path C:\Users\<USER>\AppData\Local\Google\Chrome\User Data\Default\LoginData.
+    * [evt_2002 | Order 2] Process proc_5512.exe (PID 5512) accessed credential vault or password store at path C:\Users\<USER>\AppData\Local\Temp\passwords.txt.
+    * [evt_2003 | Order 3] [PublicOutboundConnection] Process proc_5512.exe (PID 5512) initiated outbound network connection to 198.51.100.45:8080 (private) via protocol HTTP_POST.
+
+======================================================================

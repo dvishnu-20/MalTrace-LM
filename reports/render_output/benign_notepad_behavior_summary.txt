@@ -1,0 +1,23 @@
+======================================================================
+MalTrace-LM Controlled Behavior Report - Sample: benign_notepad_01
+======================================================================
+Root Processes: [2480]
+Child Processes: []
+Major Category Counts: {'process': 1, 'file': 2}
+----------------------------------------------------------------------
+
+[SECURITY ANCHORS]
+  (No security anchors triggered)
+
+[PROCESS BEHAVIOR SUMMARIES]
+
+--- Process: notepad.exe (PID 2480) ---
+  Lineage Path: notepad.exe (2480)
+  Parent Relationship: Root Process (No Parent)
+  Event Category Counts: {'process': 1, 'file': 2}
+  Behavior Statements:
+    * [evt_0001 | Order 1] Process notepad.exe (PID 2480) spawned executable C:\Windows\System32\notepad.exe with command line notepad.exe C:\Users\<USER>\Documents\meeting_notes.txt.
+    * [evt_0002 | Order 2] Process proc_2480.exe (PID 2480) executed system discovery query or read environment metadata target C:\Users\<USER>\Documents\meeting_notes.txt.
+    * [evt_0003 | Order 3] Process proc_2480.exe (PID 2480) performed WriteFile on file path C:\Users\<USER>\Documents\meeting_notes.txt.
+
+======================================================================

@@ -1,0 +1,30 @@
+======================================================================
+MalTrace-LM Controlled Behavior Report - Sample: example_trace_01
+======================================================================
+Root Processes: [3100]
+Child Processes: [4120]
+Major Category Counts: {'process': 1, 'file': 2}
+----------------------------------------------------------------------
+
+[SECURITY ANCHORS]
+  - [evt_1001] (PID 4120) (DefenseImpairment) Process vssadmin.exe (PID 4120) attempted volume shadow copy deletion or defense impairment command: vssadmin.exe Delete Shadows /All /Quiet.
+
+[PROCESS BEHAVIOR SUMMARIES]
+
+--- Process: budget_2026.docx.locked (PID 3100) ---
+  Lineage Path: budget_2026.docx.locked (3100)
+  Parent Relationship: Root Process (No Parent)
+  Event Category Counts: {'file': 2}
+  Behavior Statements:
+    * [evt_1002 | Order 2] Process proc_3100.exe (PID 3100) performed WriteFile on file path C:\Users\<USER>\Documents\budget_2026.docx.locked.
+    * [evt_1003 | Order 3] Process proc_3100.exe (PID 3100) performed WriteFile on file path C:\Users\<USER>\Desktop\READ_ME_FOR_DECRYPT_RANSOM.txt.
+
+--- Process: vssadmin.exe (PID 4120) ---
+  Lineage Path: budget_2026.docx.locked (3100) -> vssadmin.exe (4120)
+  Parent Relationship: Child of budget_2026.docx.locked (PID 3100)
+  Event Category Counts: {'process': 1}
+  High-Value Actions: ['DefenseImpairment', 'Process vssadmin.exe (PID 4120) attempted volume shadow copy deletion or defense impairment command:']
+  Behavior Statements:
+    * [evt_1001 | Order 1] [DefenseImpairment] Process vssadmin.exe (PID 4120) attempted volume shadow copy deletion or defense impairment command: vssadmin.exe Delete Shadows /All /Quiet.
+
+======================================================================

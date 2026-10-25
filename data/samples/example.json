@@ -1,0 +1,41 @@
+{
+  "sample_id": "example_trace_01",
+  "events": [
+    {
+      "event_id": "evt_1001",
+      "event_order": 1,
+      "process_id": 4120,
+      "parent_process_id": 3100,
+      "timestamp": "2026-07-28T10:15:00Z",
+      "api_name": "CreateProcessInternalW",
+      "arguments": {
+        "image_name": "C:\\Windows\\System32\\vssadmin.exe",
+        "command_line": "vssadmin.exe Delete Shadows /All /Quiet"
+      }
+    },
+    {
+      "event_id": "evt_1002",
+      "event_order": 2,
+      "process_id": 3100,
+      "parent_process_id": 1200,
+      "timestamp": "2026-07-28T10:15:03Z",
+      "api_name": "WriteFile",
+      "arguments": {
+        "target_path": "C:\\Users\\Victim\\Documents\\budget_2026.docx.locked",
+        "bytes_written": 204800
+      }
+    },
+    {
+      "event_id": "evt_1003",
+      "event_order": 3,
+      "process_id": 3100,
+      "parent_process_id": 1200,
+      "timestamp": "2026-07-28T10:15:05Z",
+      "api_name": "WriteFile",
+      "arguments": {
+        "target_path": "C:\\Users\\Victim\\Desktop\\READ_ME_FOR_DECRYPT_RANSOM.txt",
+        "bytes_written": 1024
+      }
+    }
+  ]
+}

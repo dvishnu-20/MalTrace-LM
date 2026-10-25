@@ -1,0 +1,44 @@
+{
+  "sample_id": "loader_qakbot_01",
+  "events": [
+    {
+      "event_id": "evt_qb_01",
+      "event_order": 1,
+      "process_id": 7100,
+      "parent_process_id": 2040,
+      "timestamp": "2026-08-03T15:00:00Z",
+      "api_name": "CreateProcessInternalW",
+      "arguments": {
+        "image_name": "C:\\Windows\\System32\\regsvr32.exe",
+        "command_line": "regsvr32.exe /s /u C:\\Users\\Public\\stager_dll.dll"
+      }
+    },
+    {
+      "event_id": "evt_qb_02",
+      "event_order": 2,
+      "process_id": 7100,
+      "parent_process_id": 2040,
+      "timestamp": "2026-08-03T15:00:04Z",
+      "api_name": "VirtualAllocEx",
+      "arguments": {
+        "target_pid": 2890,
+        "allocation_type": "virtualalloc-remote",
+        "protection": "PAGE_EXECUTE_READWRITE"
+      }
+    },
+    {
+      "event_id": "evt_qb_03",
+      "event_order": 3,
+      "process_id": 7100,
+      "parent_process_id": 2040,
+      "timestamp": "2026-08-03T15:00:08Z",
+      "api_name": "connect",
+      "arguments": {
+        "remote_address": "185.220.101.5",
+        "remote_port": 443,
+        "protocol": "TCP",
+        "network_destination": "public"
+      }
+    }
+  ]
+}

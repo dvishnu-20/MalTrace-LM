@@ -1,0 +1,42 @@
+{
+  "sample_id": "infostealer_agenttesla_01",
+  "events": [
+    {
+      "event_id": "evt_at_01",
+      "event_order": 1,
+      "process_id": 6120,
+      "parent_process_id": 1100,
+      "timestamp": "2026-08-02T11:10:00Z",
+      "api_name": "GetAsyncKeyState",
+      "arguments": {
+        "v_key": "VK_SHIFT",
+        "keylog_buffer": "user_password_typed"
+      }
+    },
+    {
+      "event_id": "evt_at_02",
+      "event_order": 2,
+      "process_id": 6120,
+      "parent_process_id": 1100,
+      "timestamp": "2026-08-02T11:10:03Z",
+      "api_name": "ReadFile",
+      "arguments": {
+        "target_path": "C:\\Users\\Victim\\AppData\\Local\\Google\\Chrome\\User Data\\Default\\Login Data"
+      }
+    },
+    {
+      "event_id": "evt_at_03",
+      "event_order": 3,
+      "process_id": 6120,
+      "parent_process_id": 1100,
+      "timestamp": "2026-08-02T11:10:06Z",
+      "api_name": "connect",
+      "arguments": {
+        "remote_address": "smtp.live.com",
+        "remote_port": 587,
+        "protocol": "TCP",
+        "network_destination": "public"
+      }
+    }
+  ]
+}

@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>MalTrace-LM Analyst Report - ransomware_wannacry_01</title>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; line-height: 1.5; color: #1f2937; max-width: 900px; margin: 40px auto; padding: 0 20px; }
+        h1 { color: #1e3a8a; border-bottom: 2px solid #3b82f6; padding-bottom: 8px; }
+        h2 { color: #1e40af; margin-top: 24px; }
+        .badge { display: inline-block; padding: 4px 8px; border-radius: 4px; background: #eff6ff; color: #1d4ed8; font-weight: 600; font-size: 0.85em; }
+        .summary-box { background-color: #f8fafc; border-left: 4px solid #3b82f6; padding: 16px; margin: 16px 0; border-radius: 0 6px 6px 0; }
+        table { width: 100%; border-collapse: collapse; margin-top: 12px; font-size: 0.9em; }
+        th, td { padding: 10px; text-align: left; border-bottom: 1px solid #e5e7eb; }
+        th { background-color: #f3f4f6; color: #374151; }
+        code { background-color: #f1f5f9; padding: 2px 5px; border-radius: 4px; font-family: monospace; color: #0f172a; }
+    </style>
+</head>
+<body>
+    <h1>🛡️ MalTrace-LM Defensive Analyst Report</h1>
+    <p><b>Sample ID:</b> <code>ransomware_wannacry_01</code> | <span class="badge">Mode: DETERMINISTIC</span></p>
+    
+    <div class="summary-box">
+        <h3 style="margin-top: 0;">Executive Summary</h3>
+        <p>Executive Summary: Execution trace sample 'ransomware_wannacry_01' exhibits behavior classified under family 'Ransomware.WannaCry' with High confidence (0.92). The trace contains 2 processes interacting across behavioral categories [file, process]. Primary classification signal: 'FALLBACK_RULE_RANSOMWARE_FILE_ENCRYPTION_VSS_DELETE'.</p>
+    </div>
+
+    <h2>Malware Family Prediction</h2>
+    <p><b>Predicted Family:</b> <code>Ransomware.WannaCry</code> (Confidence: <b>0.92</b> - High)</p>
+    <p><b>Primary Triggered Signal:</b> <code>FALLBACK_RULE_RANSOMWARE_FILE_ENCRYPTION_VSS_DELETE</code></p>
+    <p><b>Observed Categories:</b> <code>file, process</code></p>
+
+    <h2>Mapped MITRE ATT&CK Techniques</h2>
+    
+        <div style="border: 1px solid #e5e7eb; padding: 12px; border-radius: 6px; margin-bottom: 12px;">
+            <h4 style="margin: 0 0 6px 0;"><code>T1486</code> - Data Encrypted for Impact </h4>
+            <p style="margin: 4px 0; color: #4b5563;"><b>Tactic:</b> Impact | <b>Confidence:</b> 0.85 (High)</p>
+            <p style="margin: 4px 0; color: #4b5563;"><b>Matched Rules:</b> <code>PATTERN:.locked, PATTERN:decrypt_ransom, PATTERN:ransom, PATTERN:vssadmin</code></p>
+            <p style="margin: 4px 0; color: #4b5563;"><b>Evidence IDs:</b> <code>evt_1001, evt_1002, evt_1003</code></p>
+            <p style="margin: 4px 0;"><i>Technique T1486 (Data Encrypted for Impact) identified with 3 supporting evidence event(s) matching rules: PATTERN:.locked, PATTERN:decrypt_ransom, PATTERN:ransom, PATTERN:vssadmin.</i></p>
+        </div>
+        
+
+    <h2>Process Tree Overview</h2>
+    <ul><li><b>PID 3100</b>: <code>budget_2026.docx.locked</code> - <i>budget_2026.docx.locked (3100)</i></li><li><b>PID 4120</b>: <code>vssadmin.exe</code> - <i>budget_2026.docx.locked (3100) -> vssadmin.exe (4120)</i></li></ul>
+
+    <h2>Key Cited Evidence Table</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Event ID</th>
+                <th>Order</th>
+                <th>Category</th>
+                <th>API Name</th>
+                <th>Snippet</th>
+            </tr>
+        </thead>
+        <tbody>
+            
+        <tr>
+            <td><code>evt_1001</code></td>
+            <td>1</td>
+            <td><code>process</code></td>
+            <td><code>CreateProcessInternalW</code></td>
+            <td>PID 4120 | CreateProcessInternalW | {'image_name': 'C:\\Windows\\System32\\vssadmin.exe', 'command_line': 'vssadmin.exe Delete Shadows /All /Quiet'}</td>
+        </tr>
+        
+        <tr>
+            <td><code>evt_1002</code></td>
+            <td>2</td>
+            <td><code>file</code></td>
+            <td><code>WriteFile</code></td>
+            <td>PID 3100 | WriteFile | {'target_path': 'C:\\Users\\<USER>\\Documents\\budget_2026.docx.locked', 'bytes_written': 204800}</td>
+        </tr>
+        
+        <tr>
+            <td><code>evt_1003</code></td>
+            <td>3</td>
+            <td><code>file</code></td>
+            <td><code>WriteFile</code></td>
+            <td>PID 3100 | WriteFile | {'target_path': 'C:\\Users\\<USER>\\Desktop\\READ_ME_FOR_DECRYPT_RANSOM.txt', 'bytes_written': 1024}</td>
+        </tr>
+        
+        </tbody>
+    </table>
+
+    <h2>Defensive Recommendations</h2>
+    <ul><li>Isolate affected host endpoint from local network subnets.</li><li>Terminate processes associated with suspicious command execution lineage.</li><li>Block outbound remote IP destinations identified in network event citations.</li><li>Audit autostart registry keys and scheduled tasks for unauthorized persistence entries.</li></ul>
+
+    <h2>Uncertainty & Limitations</h2>
+    <p><i>Uncertainty & Limitations: Analysis is strictly grounded in observed trace events. Unexecuted code branches, dynamic evasion delays, and kernel driver interactions not present in the input trace log are outside the scope of this report. Categorical assertions reflect deterministic evidence linkage.</i></p>
+</body>
+</html>

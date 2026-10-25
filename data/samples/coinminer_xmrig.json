@@ -1,0 +1,30 @@
+{
+  "sample_id": "coinminer_xmrig_01",
+  "events": [
+    {
+      "event_id": "evt_5001",
+      "event_order": 1,
+      "process_id": 9210,
+      "parent_process_id": 1050,
+      "timestamp": "2026-07-28T10:50:00Z",
+      "api_name": "CreateServiceW",
+      "arguments": {
+        "service_name": "WinSysUpdateSvc",
+        "binary_path": "C:\\ProgramData\\xmrig\\xmrig_miner.exe --url=stratum+tcp://xmr-pool-example.org:3333 --user=48ed... --pass=x"
+      }
+    },
+    {
+      "event_id": "evt_5002",
+      "event_order": 2,
+      "process_id": 9500,
+      "parent_process_id": 9210,
+      "timestamp": "2026-07-28T10:50:02Z",
+      "api_name": "WSAConnect",
+      "arguments": {
+        "destination_ip": "198.51.100.99",
+        "destination_port": 3333,
+        "protocol": "STRATUM_TCP"
+      }
+    }
+  ]
+}

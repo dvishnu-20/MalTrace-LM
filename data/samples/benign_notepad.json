@@ -1,0 +1,41 @@
+{
+  "sample_id": "benign_notepad_01",
+  "events": [
+    {
+      "event_id": "evt_0001",
+      "event_order": 1,
+      "process_id": 2480,
+      "parent_process_id": 1024,
+      "timestamp": "2026-07-28T10:00:01Z",
+      "api_name": "CreateProcessInternalW",
+      "arguments": {
+        "image_name": "C:\\Windows\\System32\\notepad.exe",
+        "command_line": "notepad.exe C:\\Users\\analyst\\Documents\\meeting_notes.txt"
+      }
+    },
+    {
+      "event_id": "evt_0002",
+      "event_order": 2,
+      "process_id": 2480,
+      "parent_process_id": 1024,
+      "timestamp": "2026-07-28T10:00:02Z",
+      "api_name": "NtCreateFile",
+      "arguments": {
+        "target_path": "C:\\Users\\analyst\\Documents\\meeting_notes.txt",
+        "desired_access": "GENERIC_READ"
+      }
+    },
+    {
+      "event_id": "evt_0003",
+      "event_order": 3,
+      "process_id": 2480,
+      "parent_process_id": 1024,
+      "timestamp": "2026-07-28T10:00:05Z",
+      "api_name": "WriteFile",
+      "arguments": {
+        "target_path": "C:\\Users\\analyst\\Documents\\meeting_notes.txt",
+        "bytes_written": 142
+      }
+    }
+  ]
+}

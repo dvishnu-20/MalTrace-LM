@@ -1,0 +1,107 @@
+{
+  "run_id": "run_a4ebabe814",
+  "timestamp": "2026-07-28T20:50:42.393518",
+  "total_files": 7,
+  "successful_files": 7,
+  "failed_files": 0,
+  "files": [
+    {
+      "source_path": "data\\samples\\benign_notepad.json",
+      "file_size_bytes": 1127,
+      "parse_status": "success",
+      "event_count": 3,
+      "raw_event_count": 3,
+      "process_count": 1,
+      "warnings": [
+        "Missing parent process PID 1024 for process notepad.exe (PID 2480)"
+      ],
+      "sha256": "2b5f1a184841989d320c578c64820405c301ce137b7a714d75d2c6d8264e9777",
+      "sample_id": "benign_notepad_01",
+      "label": null
+    },
+    {
+      "source_path": "data\\samples\\coinminer_xmrig.json",
+      "file_size_bytes": 811,
+      "parse_status": "success",
+      "event_count": 2,
+      "raw_event_count": 2,
+      "process_count": 2,
+      "warnings": [
+        "Missing parent process PID 1050 for process proc_9210.exe (PID 9210)"
+      ],
+      "sha256": "d56a6a2b78c8f74926928ddb9052845634733d5cae875bc7b678acd47d5dd15f",
+      "sample_id": "coinminer_xmrig_01",
+      "label": null
+    },
+    {
+      "source_path": "data\\samples\\dropper_emotet.json",
+      "file_size_bytes": 1304,
+      "parse_status": "success",
+      "event_count": 3,
+      "raw_event_count": 3,
+      "process_count": 2,
+      "warnings": [
+        "Missing parent process PID 4020 for process WINWORD.EXE (PID 7890)"
+      ],
+      "sha256": "991c08ea358f9bad0a1edcc6db70b50be32a5ab175f0a52a51a79a9711b7fc08",
+      "sample_id": "dropper_emotet_01",
+      "label": null
+    },
+    {
+      "source_path": "data\\samples\\example.json",
+      "file_size_bytes": 1110,
+      "parse_status": "success",
+      "event_count": 3,
+      "raw_event_count": 3,
+      "process_count": 2,
+      "warnings": [
+        "Missing parent process PID 1200 for process budget_2026.docx.locked (PID 3100)"
+      ],
+      "sha256": "b5c65420ff446a14860175eccf8de38e481818e7db59bed6899f7cfbc462da76",
+      "sample_id": "example_trace_01",
+      "label": null
+    },
+    {
+      "source_path": "data\\samples\\infostealer_redline.json",
+      "file_size_bytes": 1121,
+      "parse_status": "success",
+      "event_count": 3,
+      "raw_event_count": 3,
+      "process_count": 1,
+      "warnings": [
+        "Missing parent process PID 2040 for process LoginData (PID 5512)"
+      ],
+      "sha256": "f0add470dec8f1ffc439017c8eae1f22aaa0bcc420344f657c3c5919a71491af",
+      "sample_id": "infostealer_redline_01",
+      "label": null
+    },
+    {
+      "source_path": "data\\samples\\ransomware_wannacry.json",
+      "file_size_bytes": 1116,
+      "parse_status": "success",
+      "event_count": 3,
+      "raw_event_count": 3,
+      "process_count": 2,
+      "warnings": [
+        "Missing parent process PID 1200 for process budget_2026.docx.locked (PID 3100)"
+      ],
+      "sha256": "6c847f7ab6494306b1708961a4044c11a8911e3d8106d7f63c86ce6afc73ac30",
+      "sample_id": "ransomware_wannacry_01",
+      "label": null
+    },
+    {
+      "source_path": "data\\samples\\trojan_asyncrat.json",
+      "file_size_bytes": 1230,
+      "parse_status": "success",
+      "event_count": 3,
+      "raw_event_count": 3,
+      "process_count": 1,
+      "warnings": [
+        "Missing parent process PID 1100 for process proc_6120.exe (PID 6120)"
+      ],
+      "sha256": "b9187ae85f56dba509deeae1c6925446ec29742724338e064cca8a13be974997",
+      "sample_id": "trojan_asyncrat_01",
+      "label": null
+    }
+  ]
+}

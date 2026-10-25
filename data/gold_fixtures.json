@@ -1,0 +1,29 @@
+{
+  "gold_version": "1.0.0",
+  "samples": {
+    "ransomware_wannacry.json": {
+      "sample_id": "ransomware_wannacry_01",
+      "expected_techniques": ["T1486"]
+    },
+    "infostealer_redline.json": {
+      "sample_id": "infostealer_redline_01",
+      "expected_techniques": ["T1555", "T1071.001"]
+    },
+    "trojan_asyncrat.json": {
+      "sample_id": "trojan_asyncrat_01",
+      "expected_techniques": ["T1547.001", "T1071.001"]
+    },
+    "dropper_emotet.json": {
+      "sample_id": "dropper_emotet_01",
+      "expected_techniques": ["T1059.001", "T1071.001"]
+    },
+    "coinminer_xmrig.json": {
+      "sample_id": "coinminer_xmrig_01",
+      "expected_techniques": ["T1543.003", "T1071.001"]
+    },
+    "benign_notepad.json": {
+      "sample_id": "benign_notepad_01",
+      "expected_techniques": ["T1005"]
+    }
+  }
+}

