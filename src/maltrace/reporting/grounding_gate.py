@@ -178,6 +178,16 @@ def build_analyst_report(
 
     try:
         response, metadata = llm_provider.generate_summary(llm_request)
+        if response is None:
+            manifest.llm_provider = metadata.get("provider", llm_provider.provider_name)
+            manifest.llm_model = metadata.get("model", llm_provider.model_name)
+            manifest.temperature = metadata.get("temperature", 0.0)
+            manifest.response_hash = metadata.get("response_hash")
+            manifest.validation_warnings = ["LLM provider returned empty response payload."]
+            manifest.validation_status = "failed"
+            det_report.manifest = manifest
+            return det_report
+
         is_valid, warnings = validate_llm_response(response, result)
 
         manifest.llm_provider = metadata.get("provider", llm_provider.provider_name)

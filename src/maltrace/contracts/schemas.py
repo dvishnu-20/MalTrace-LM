@@ -10,12 +10,12 @@ class RawEvent(BaseModel):
     event_id: str = Field(..., description="Unique identifier for the event")
     event_order: int = Field(..., description="Sequential order index of event within trace")
     process_id: int = Field(..., description="Process ID (PID)")
-    parent_process_id: int = Field(0, description="Parent Process ID (PPID)")
-    timestamp: Optional[str] = Field(None, description="ISO timestamp or relative execution timestamp")
+    parent_process_id: int = Field(default=0, description="Parent Process ID (PPID)")
+    timestamp: Optional[str] = Field(default=None, description="ISO timestamp or relative execution timestamp")
     api_name: str = Field(..., description="Win32/Native API or action name")
     arguments: Dict[str, Any] = Field(default_factory=dict, description="Raw event arguments")
-    source_file: str = Field("unknown.json", description="Source file path or identifier")
-    schema_version: str = Field("1.0.0", description="Contract schema version")
+    source_file: str = Field(default="unknown.json", description="Source file path or identifier")
+    schema_version: str = Field(default="1.0.0", description="Contract schema version")
 
 
 class RawTrace(BaseModel):
@@ -24,6 +24,7 @@ class RawTrace(BaseModel):
     """
     sample_id: str
     events: List[RawEvent] = Field(default_factory=list)
+    source_format: str = Field(default="generic", description="Source format identifier")
     schema_version: str = "1.0.0"
 
 
@@ -35,26 +36,26 @@ class NormalizedEvent(BaseModel):
     event_id: str = Field(..., description="Unique identifier for the event")
     event_order: int = Field(..., description="Sequential order index of event")
     process_id: int = Field(..., description="Process ID (PID)")
-    parent_process_id: int = Field(0, description="Parent Process ID (PPID)")
-    timestamp: Optional[str] = Field(None, description="Event timestamp")
+    parent_process_id: int = Field(default=0, description="Parent Process ID (PPID)")
+    timestamp: Optional[str] = Field(default=None, description="Event timestamp")
     api_name: str = Field(..., description="Original Win32 API name")
     category: str = Field(..., description="Normalized category (e.g. process, registry, file, network, service, memory, synchronization, other)")
     safe_arguments: Dict[str, Any] = Field(default_factory=dict, description="Sanitized/safe argument key-values")
-    source_file: str = Field(..., description="Source trace file name")
-    schema_version: str = Field("1.0.0", description="Contract schema version")
+    source_file: str = Field(default="unknown.json", description="Source trace file name")
+    schema_version: str = Field(default="1.0.0", description="Contract schema version")
     
     # Noise reduction & deduplication fields
-    repeat_count: int = Field(1, description="Number of consecutive identical events collapsed")
-    first_order: Optional[int] = Field(None, description="First order index before collapse")
-    last_order: Optional[int] = Field(None, description="Last order index before collapse")
-    first_timestamp: Optional[str] = Field(None, description="First event timestamp")
-    last_timestamp: Optional[str] = Field(None, description="Last event timestamp")
+    repeat_count: int = Field(default=1, description="Number of consecutive identical events collapsed")
+    first_order: Optional[int] = Field(default=None, description="First order index before collapse")
+    last_order: Optional[int] = Field(default=None, description="Last order index before collapse")
+    first_timestamp: Optional[str] = Field(default=None, description="First event timestamp")
+    last_timestamp: Optional[str] = Field(default=None, description="Last event timestamp")
     
     # Enhanced canonical normalization fields
-    path_category: Optional[str] = Field(None, description="Safe path category (system_directory, user_directory, temporary_directory, application_data, startup_location, unknown)")
-    is_persistence: bool = Field(False, description="True if event accesses persistence mechanisms like autostart registry keys")
-    network_category: Optional[str] = Field(None, description="Network category (loopback, private, public, domain-like, unknown)")
-    deterministic_hash: Optional[str] = Field(None, description="Deterministic event SHA-256 hash")
+    path_category: Optional[str] = Field(default=None, description="Safe path category (system_directory, user_directory, temporary_directory, application_data, startup_location, unknown)")
+    is_persistence: bool = Field(default=False, description="True if event accesses persistence mechanisms like autostart registry keys")
+    network_category: Optional[str] = Field(default=None, description="Network category (loopback, private, public, domain-like, unknown)")
+    deterministic_hash: Optional[str] = Field(default=None, description="Deterministic event SHA-256 hash")
 
 
 class ProcessSummary(BaseModel):
@@ -117,11 +118,11 @@ class FamilyPrediction(BaseModel):
     """
     family_name: str = Field(..., description="Predicted family or benign label")
     confidence: float = Field(..., ge=0.0, le=1.0, description="Confidence score between 0.0 and 1.0")
-    confidence_label: str = Field("High", description="Categorical confidence (High, Medium, Low)")
+    confidence_label: str = Field(default="High", description="Categorical confidence (High, Medium, Low)")
     rule_triggered: str = Field(..., description="Primary rule or model signal triggered")
     supporting_evidence_ids: List[str] = Field(default_factory=list, description="Cited event IDs for prediction")
     top_class_probabilities: Dict[str, float] = Field(default_factory=dict, description="Calibrated probabilities or scores for candidate families")
-    model_version: Optional[str] = Field(None, description="Model baseline version or name if predicted by ML model")
+    model_version: Optional[str] = Field(default=None, description="Model baseline version or name if predicted by ML model")
 
 
 
@@ -133,11 +134,11 @@ class TechniquePrediction(BaseModel):
     technique_name: str = Field(..., description="Name of the technique")
     tactic: str = Field(..., description="MITRE ATT&CK Tactic (e.g. Impact, Persistence)")
     confidence: float = Field(..., ge=0.0, le=1.0, description="Confidence score between 0.0 and 1.0")
-    confidence_label: str = Field("High", description="Categorical confidence (High, Medium, Low, Needs Review)")
+    confidence_label: str = Field(default="High", description="Categorical confidence (High, Medium, Low, Needs Review)")
     supporting_evidence_ids: List[str] = Field(..., min_length=1, description="Non-empty list of cited event IDs supporting mapping")
     matched_rules: List[str] = Field(default_factory=list, description="Specific catalog patterns or rules matched")
-    explanation: str = Field("Matched observed execution trace pattern.", description="Human-readable explanation of why mapping triggered")
-    needs_review: bool = Field(False, description="True if technique mapping is ambiguous or near benign thresholds")
+    explanation: str = Field(default="Matched observed execution trace pattern.", description="Human-readable explanation of why mapping triggered")
+    needs_review: bool = Field(default=False, description="True if technique mapping is ambiguous or near benign thresholds")
 
 
 
@@ -185,11 +186,11 @@ class RunManifest(BaseModel):
     output_file: Optional[str] = None
     execution_time_ms: float
     seed: int = 42
-    llm_provider: str = Field("disabled", description="LLM provider name: disabled, openai-compatible, mock")
-    llm_model: Optional[str] = Field(None, description="LLM model identifier")
-    temperature: float = Field(0.0, ge=0.0, le=2.0, description="LLM generation temperature")
-    response_hash: Optional[str] = Field(None, description="SHA-256 hash of LLM response")
-    validation_status: str = Field("disabled", description="Validation status: passed, failed, disabled")
+    llm_provider: str = Field(default="disabled", description="LLM provider name: disabled, openai-compatible, mock")
+    llm_model: Optional[str] = Field(default=None, description="LLM model identifier")
+    temperature: float = Field(default=0.0, ge=0.0, le=2.0, description="LLM generation temperature")
+    response_hash: Optional[str] = Field(default=None, description="SHA-256 hash of LLM response")
+    validation_status: str = Field(default="disabled", description="Validation status: passed, failed, disabled")
     validation_warnings: List[str] = Field(default_factory=list, description="Warnings issued during grounding validation")
 
 

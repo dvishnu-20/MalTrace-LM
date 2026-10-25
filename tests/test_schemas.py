@@ -26,7 +26,8 @@ def test_raw_event_schema_validation():
 
     with pytest.raises(ValidationError):
         # Missing required field api_name
-        RawEvent(sample_id="s1", event_id="e1", event_order=1, process_id=100)
+        raw_kwargs = {"sample_id": "s1", "event_id": "e1", "event_order": 1, "process_id": 100}
+        RawEvent(**raw_kwargs)
 
 
 def test_behavior_claim_schema():

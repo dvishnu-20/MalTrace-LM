@@ -118,12 +118,14 @@ def test_mock_llm_timeout_and_provider_failure_fallback():
     timeout_provider = MockLLMProvider(mode="timeout")
     rep_timeout = build_analyst_report(result, llm_provider=timeout_provider)
     assert rep_timeout.generation_mode == "deterministic"
+    assert rep_timeout.manifest is not None
     assert rep_timeout.manifest.validation_status == "failed"
 
     # Connection failure
     fail_provider = MockLLMProvider(mode="failure")
     rep_fail = build_analyst_report(result, llm_provider=fail_provider)
     assert rep_fail.generation_mode == "deterministic"
+    assert rep_fail.manifest is not None
     assert rep_fail.manifest.validation_status == "failed"
 
 
@@ -133,6 +135,7 @@ def test_acceptance_gate_no_llm_configured_default():
 
     report_default = build_analyst_report(result, llm_provider=None)
     assert report_default.generation_mode == "deterministic"
+    assert report_default.manifest is not None
     assert report_default.manifest.validation_status == "disabled"
 
 

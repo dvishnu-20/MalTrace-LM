@@ -146,8 +146,9 @@ def cluster_trace_samples(
                 dist_matrix[j, i] = combined_dist
 
     # Apply Agglomerative Clustering
+    n_clust: Any = None
     clusterer = AgglomerativeClustering(
-        n_clusters=None,
+        n_clusters=n_clust,
         distance_threshold=distance_threshold,
         metric="precomputed",
         linkage="average"

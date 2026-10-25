@@ -21,7 +21,7 @@ class BaseLLMProvider:
     provider_name: str = "base"
     model_name: str = "none"
 
-    def generate_summary(self, request: LLMReportRequest) -> Tuple[LLMReportResponse, Dict[str, Any]]:
+    def generate_summary(self, request: LLMReportRequest) -> Tuple[Optional[LLMReportResponse], Dict[str, Any]]:
         raise NotImplementedError()
 
 
@@ -32,7 +32,7 @@ class DisabledLLMProvider(BaseLLMProvider):
     provider_name: str = "disabled"
     model_name: str = "none"
 
-    def generate_summary(self, request: LLMReportRequest) -> Tuple[LLMReportResponse, Dict[str, Any]]:
+    def generate_summary(self, request: LLMReportRequest) -> Tuple[Optional[LLMReportResponse], Dict[str, Any]]:
         raise RuntimeError("LLM Provider is disabled. Enable optional LLM provider via configuration.")
 
 
@@ -57,7 +57,7 @@ class OpenAICompatibleLLMProvider(BaseLLMProvider):
         self.temperature = temperature
         self.timeout_seconds = timeout_seconds
 
-    def generate_summary(self, request: LLMReportRequest) -> Tuple[LLMReportResponse, Dict[str, Any]]:
+    def generate_summary(self, request: LLMReportRequest) -> Tuple[Optional[LLMReportResponse], Dict[str, Any]]:
         prompt = (
             "You are a defensive malware analyst assistant. Synthesize the provided structured facts into a concise "
             "JSON report. Respond ONLY in valid JSON matching schema keys: summary, behavior_claims, cited_event_ids, "
@@ -124,7 +124,7 @@ class GeminiLLMProvider(BaseLLMProvider):
         self.temperature = temperature
         self.timeout_seconds = timeout_seconds
 
-    def generate_summary(self, request: LLMReportRequest) -> Tuple[LLMReportResponse, Dict[str, Any]]:
+    def generate_summary(self, request: LLMReportRequest) -> Tuple[Optional[LLMReportResponse], Dict[str, Any]]:
         url = f"https://generativelanguage.googleapis.com/v1beta/models/{self.model_name}:generateContent?key={self.api_key}"
         prompt = (
             "You are a defensive malware analyst assistant. Synthesize the provided structured facts into a concise "
@@ -184,7 +184,7 @@ class AnthropicLLMProvider(BaseLLMProvider):
         self.temperature = temperature
         self.timeout_seconds = timeout_seconds
 
-    def generate_summary(self, request: LLMReportRequest) -> Tuple[LLMReportResponse, Dict[str, Any]]:
+    def generate_summary(self, request: LLMReportRequest) -> Tuple[Optional[LLMReportResponse], Dict[str, Any]]:
         url = "https://api.anthropic.com/v1/messages"
         prompt = (
             "You are a defensive malware analyst assistant. Synthesize the provided structured facts into a concise "
@@ -238,7 +238,7 @@ class MockLLMProvider(BaseLLMProvider):
         self.mode = mode
         self.response_override = response_override
 
-    def generate_summary(self, request: LLMReportRequest) -> Tuple[LLMReportResponse, Dict[str, Any]]:
+    def generate_summary(self, request: LLMReportRequest) -> Tuple[Optional[LLMReportResponse], Dict[str, Any]]:
         if self.mode == "timeout":
             raise TimeoutError("Mock LLM Provider timed out after 10.0s")
         elif self.mode == "failure":
@@ -284,7 +284,13 @@ class MockLLMProvider(BaseLLMProvider):
         raw_str = json.dumps(resp_dict)
         res_hash = hashlib.sha256(raw_str.encode("utf-8")).hexdigest()[:16]
 
-        response_obj = LLMReportResponse(**resp_dict)
+        response_obj = LLMReportResponse(
+            summary=str(resp_dict["summary"]),
+            behavior_claims=list(resp_dict["behavior_claims"]),
+            cited_event_ids=list(resp_dict["cited_event_ids"]),
+            uncertainty_statement=str(resp_dict["uncertainty_statement"]),
+            analyst_notes=str(resp_dict["analyst_notes"])
+        )
         metadata = {
             "provider": self.provider_name,
             "model": self.model_name,

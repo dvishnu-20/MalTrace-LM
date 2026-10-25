@@ -155,6 +155,7 @@ def test_too_short_trace_family_abstention():
 
     assert summary.family_abstained is True
     assert updated_fam.family_name == "Abstained"
+    assert summary.abstention_reason is not None
     assert "ABSTAINED_TOO_FEW_EVENTS" in summary.abstention_reason
 
 
@@ -180,6 +181,7 @@ def test_low_confidence_family_score_abstention():
 
     assert summary.family_abstained is True
     assert updated_fam.family_name == "Abstained"
+    assert summary.abstention_reason is not None
     assert "ABSTAINED_LOW_CLASSIFIER_CONFIDENCE" in summary.abstention_reason
 
 

@@ -238,10 +238,12 @@ def parse_sysmon_json(
     if isinstance(data, dict) and "events" in data:
         data = data["events"]
 
+    raw_items: List[Dict[str, Any]] = data if isinstance(data, list) else []
+
     events: List[RawEvent] = []
     order = 1
 
-    for idx, item in enumerate(data):
+    for idx, item in enumerate(raw_items):
         eid = int(item.get("event_id") or item.get("EventID") or item.get("winlog", {}).get("event_id", 0))
         event_data = item.get("event_data") or item.get("data") or item
         ts = item.get("@timestamp") or item.get("timestamp") or item.get("UtcTime")

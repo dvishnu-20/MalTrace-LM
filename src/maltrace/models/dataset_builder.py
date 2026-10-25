@@ -112,7 +112,8 @@ def split_dataset_hash_grouped(
         # Group by label and pick equal numbers per label
         label_map: Dict[str, List[TraceSampleRecord]] = defaultdict(list)
         for r in records:
-            label_map[r.label].append(r)
+            lbl = r.label if r.label is not None else "Unknown"
+            label_map[lbl].append(r)
         
         min_count = min(len(v) for v in label_map.values()) if label_map else 0
         min_count = max(1, min_count)
@@ -137,7 +138,7 @@ def split_dataset_hash_grouped(
         key=lambda h: hashlib.sha256(f"{h}:{seed}".encode("utf-8")).hexdigest()
     )
     n_total = len(scored_hashes)
-    n_test = max(1, int(round(n_total * test_ratio))) if n_total > 1 else 0
+    n_test = max(1, round(n_total * test_ratio)) if n_total > 1 else 0
     n_train = max(1, n_total - n_test)
     if n_train + n_test > n_total:
         n_test = max(1, n_total - n_train)
@@ -172,7 +173,8 @@ def split_dataset_hash_grouped_3way(
     if balanced_subset:
         label_map: Dict[str, List[TraceSampleRecord]] = defaultdict(list)
         for r in records:
-            label_map[r.label].append(r)
+            lbl = r.label if r.label is not None else "Unknown"
+            label_map[lbl].append(r)
 
         min_count = max(1, min(len(v) for v in label_map.values())) if label_map else 0
         subset_records: List[TraceSampleRecord] = []
@@ -197,8 +199,8 @@ def split_dataset_hash_grouped_3way(
         n_val = 0
         n_train = max(1, n_total - n_test)
     else:
-        n_test = max(1, int(round(n_total * test_ratio)))
-        n_val = max(1, int(round(n_total * val_ratio)))
+        n_test = max(1, round(n_total * test_ratio))
+        n_val = max(1, round(n_total * val_ratio))
         n_train = max(1, n_total - n_test - n_val)
         while n_train + n_val + n_test > n_total:
             if n_val > 1:

@@ -9,9 +9,15 @@ from pathlib import Path
 from typing import List, Dict, Tuple, Optional, Union, Any
 import numpy as np
 
-import torch
-import torch.nn as nn
-import torch.nn.functional as F
+import torch as _torch
+import torch.nn as _nn
+import torch.nn.functional as _F
+import torch.optim as _optim
+
+torch: Any = _torch
+nn: Any = _nn
+F: Any = _F
+optim: Any = _optim
 
 from maltrace.contracts.schemas import NormalizedEvent
 
@@ -36,15 +42,15 @@ class APISequenceTokenizer:
         """
         for events in traces_events:
             for ev in events:
-                api = str(ev.api_name).lower().strip()
-                cat = str(ev.category).lower().strip()
+                api = ev.api_name.lower().strip()
+                cat = ev.category.lower().strip()
                 token = f"{cat}::{api}"
                 if token not in self.vocab:
                     idx = len(self.vocab)
                     self.vocab[token] = idx
                     self.inv_vocab[idx] = token
 
-    def tokenize(self, events: List[NormalizedEvent], max_length: int = 128) -> Tuple[torch.Tensor, List[str]]:
+    def tokenize(self, events: List[NormalizedEvent], max_length: int = 128) -> Tuple[Any, List[str]]:
         """
         Convert a list of NormalizedEvent into a padded LongTensor and token string list.
         """
@@ -52,8 +58,8 @@ class APISequenceTokenizer:
         token_ids: List[int] = []
 
         for ev in events:
-            api = str(ev.api_name).lower().strip()
-            cat = str(ev.category).lower().strip()
+            api = ev.api_name.lower().strip()
+            cat = ev.category.lower().strip()
             t_str = f"{cat}::{api}"
             token_strs.append(t_str)
             token_ids.append(self.vocab.get(t_str, self.vocab[self.unk_token]))
@@ -92,7 +98,7 @@ class AttentionLayer(nn.Module):
             nn.Linear(hidden_dim // 2, 1, bias=False)
         )
 
-    def forward(self, lstm_outputs: torch.Tensor, mask: Optional[torch.Tensor] = None) -> Tuple[torch.Tensor, torch.Tensor]:
+    def forward(self, lstm_outputs: Any, mask: Optional[Any] = None) -> Tuple[Any, Any]:
         """
         lstm_outputs: (batch_size, seq_len, hidden_dim)
         mask: (batch_size, seq_len) True for valid tokens, False for padding
@@ -146,7 +152,7 @@ class APISequenceBiLSTM(nn.Module):
             nn.Linear(hidden_dim, num_classes)
         )
 
-    def forward(self, token_ids: torch.Tensor) -> Tuple[torch.Tensor, torch.Tensor]:
+    def forward(self, token_ids: Any) -> Tuple[Any, Any]:
         """
         token_ids: (batch_size, seq_len)
         Returns:

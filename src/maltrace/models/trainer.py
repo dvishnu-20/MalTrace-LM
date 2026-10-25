@@ -49,11 +49,16 @@ def compute_metrics(
 
     acc = float(accuracy_score(y_true, y_pred))
     bal_acc = float(balanced_accuracy_score(y_true, y_pred))
-    macro_f1 = float(f1_score(y_true, y_pred, average="macro", zero_division=0))
-    weighted_f1 = float(f1_score(y_true, y_pred, average="weighted", zero_division=0))
+    zero_div: Any = 0
+    macro_f1 = float(f1_score(y_true, y_pred, average="macro", zero_division=zero_div))
+    weighted_f1 = float(f1_score(y_true, y_pred, average="weighted", zero_division=zero_div))
 
     all_unique_labels = sorted(list(set(y_true + y_pred)))
-    p, r, f, s = precision_recall_fscore_support(y_true, y_pred, labels=all_unique_labels, zero_division=0)
+    prs_result: Any = precision_recall_fscore_support(y_true, y_pred, labels=all_unique_labels, zero_division=zero_div)
+    p: Any = prs_result[0]
+    r: Any = prs_result[1]
+    f: Any = prs_result[2]
+    s: Any = prs_result[3]
 
     per_family = {}
     for idx, lbl in enumerate(all_unique_labels):
@@ -61,7 +66,7 @@ def compute_metrics(
             "precision": float(p[idx]),
             "recall": float(r[idx]),
             "f1": float(f[idx]),
-            "support": int(s[idx])
+            "support": int(s[idx]) if s is not None else 0
         }
 
     cm = confusion_matrix(y_true, y_pred, labels=all_unique_labels)
@@ -106,20 +111,20 @@ def train_model(
         val_recs = []
 
     baseline_clean = baseline.lower().strip()
+    train_labels: List[str] = [str(r.label) for r in train_recs if r.label is not None]
+    val_labels: Optional[List[str]] = [str(r.label) for r in val_recs if r.label is not None] if val_recs else None
 
     if baseline_clean == "majority":
         model = MajorityClassBaseline()
-        model.fit(train_recs, [r.label for r in train_recs])
+        model.fit(train_recs, train_labels)
         y_test_pred = model.predict(test_recs)
 
     elif baseline_clean == "tfidf":
         model = TfidfBehaviorClassifier(seed=seed)
         train_texts = extract_text_features(train_recs)
-        train_labels = [r.label for r in train_recs]
 
         # Use held-out validation split for calibration to strictly prevent test leakage
         val_texts = extract_text_features(val_recs) if val_recs else None
-        val_labels = [r.label for r in val_recs] if val_recs else None
 
         model.fit(train_texts, train_labels, calib_texts=val_texts, calib_y=val_labels)
         test_texts = extract_text_features(test_recs)
@@ -128,10 +133,8 @@ def train_model(
     elif baseline_clean == "structured":
         model = StructuredCountClassifier(seed=seed)
         X_train = extract_structured_features(train_recs)
-        train_labels = [r.label for r in train_recs]
 
         X_val = extract_structured_features(val_recs) if val_recs else None
-        val_labels = [r.label for r in val_recs] if val_recs else None
 
         model.fit(X_train, train_labels, calib_X=X_val, calib_y=val_labels)
         X_test = extract_structured_features(test_recs)
@@ -141,7 +144,7 @@ def train_model(
         raise ValueError(f"Unknown baseline: '{baseline}'. Expected 'majority', 'tfidf', or 'structured'.")
 
     # Evaluate independently on held-out test set
-    y_test_true = [r.label for r in test_recs]
+    y_test_true: List[str] = [str(r.label) for r in test_recs if r.label is not None]
     metrics = compute_metrics(y_test_true, y_test_pred, list(model.classes_))
     metrics["excluded_unknown_labels_count"] = excluded_count
 

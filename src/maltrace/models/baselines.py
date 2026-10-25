@@ -49,13 +49,15 @@ class TfidfBehaviorClassifier:
     """
     Baseline 2: TF-IDF over controlled behavior text + Logistic Regression classifier.
     """
+    clf: Any
+    classes_: Any
 
     def __init__(self, seed: int = 42):
         self.seed = seed
         self.vectorizer = TfidfVectorizer(ngram_range=(1, 2), max_features=500, token_pattern=r"(?u)\b\w+\b")
         self.clf = LogisticRegression(C=1.0, random_state=seed, max_iter=500, solver="lbfgs")
         self.label_encoder = LabelEncoder()
-        self.classes_: np.ndarray = np.array([])
+        self.classes_ = np.array([])
         self.is_calibrated: bool = False
 
     def fit(self, texts: List[str], y: List[str], calib_texts: Optional[List[str]] = None, calib_y: Optional[List[str]] = None):
@@ -113,13 +115,15 @@ class StructuredCountClassifier:
     """
     Baseline 3: Structured numerical feature counts + Logistic Regression / Gradient Boosting classifier.
     """
+    clf: Any
+    classes_: Any
 
     def __init__(self, seed: int = 42):
         self.seed = seed
         self.scaler = StandardScaler()
         self.clf = LogisticRegression(C=1.0, random_state=seed, max_iter=500, solver="lbfgs")
         self.label_encoder = LabelEncoder()
-        self.classes_: np.ndarray = np.array([])
+        self.classes_ = np.array([])
         self.is_calibrated: bool = False
 
     def fit(self, X: np.ndarray, y: List[str], calib_X: Optional[np.ndarray] = None, calib_y: Optional[List[str]] = None):

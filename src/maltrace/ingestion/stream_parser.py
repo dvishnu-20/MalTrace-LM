@@ -131,7 +131,8 @@ def stream_parse_file(
 
 
 import pyarrow as pa
-import pyarrow.parquet as pq
+import pyarrow.parquet as _pq
+pq: Any = _pq
 
 
 def _chunk_to_arrow_table(chunk: List[Dict[str, Any]]) -> pa.Table:
@@ -180,7 +181,7 @@ def process_batch(
     total_events_count = 0
 
     chunk_buffer: List[Dict[str, Any]] = []
-    parquet_writer: Optional[pq.ParquetWriter] = None
+    parquet_writer: Any = None
 
     with open(jsonl_path, "w", encoding="utf-8") as jsonl_file:
         for file_p in files_to_process:
