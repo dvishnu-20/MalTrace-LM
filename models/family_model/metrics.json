@@ -1,0 +1,105 @@
+{
+  "accuracy": 0.0,
+  "balanced_accuracy": 0.0,
+  "macro_f1": 0.0,
+  "weighted_f1": 0.0,
+  "per_family": {
+    "Benign.Activity": {
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1": 0.0,
+      "support": 1
+    },
+    "Coinminer.XMRig": {
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1": 0.0,
+      "support": 1
+    },
+    "Dropper.Emotet": {
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1": 0.0,
+      "support": 1
+    },
+    "Ransomware.WannaCry": {
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1": 0.0,
+      "support": 1
+    },
+    "Stealer.RedLine": {
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1": 0.0,
+      "support": 1
+    },
+    "Trojan.AsyncRAT": {
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1": 0.0,
+      "support": 0
+    }
+  },
+  "labels_order": [
+    "Benign.Activity",
+    "Coinminer.XMRig",
+    "Dropper.Emotet",
+    "Ransomware.WannaCry",
+    "Stealer.RedLine",
+    "Trojan.AsyncRAT"
+  ],
+  "confusion_matrix": [
+    [
+      0,
+      0,
+      0,
+      0,
+      0,
+      1
+    ],
+    [
+      0,
+      0,
+      0,
+      0,
+      0,
+      1
+    ],
+    [
+      0,
+      0,
+      0,
+      0,
+      0,
+      1
+    ],
+    [
+      0,
+      0,
+      0,
+      0,
+      0,
+      1
+    ],
+    [
+      0,
+      0,
+      0,
+      0,
+      0,
+      1
+    ],
+    [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ]
+  ],
+  "sample_count": 5,
+  "disclaimer": "Results produced on synthetic development fixtures/subsets. Not general malware detection performance.",
+  "excluded_unknown_labels_count": 1
+}

@@ -1,0 +1,16 @@
+{
+  "baseline": "tfidf",
+  "vocabulary_version": "1.0.0",
+  "maltrace_version": "0.1.0",
+  "seed": 42,
+  "split_hash": "6861118ea3bb",
+  "training_timestamp": "2026-07-28T15:32:54Z",
+  "total_samples": 6,
+  "train_samples": 1,
+  "test_samples": 5,
+  "excluded_unknown_samples": 1,
+  "classes": [
+    "Trojan.AsyncRAT"
+  ],
+  "disclaimer": "Results produced on synthetic development fixtures/subsets. Not general malware detection performance."
+}
