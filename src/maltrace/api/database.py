@@ -15,7 +15,9 @@ def get_db_path() -> Path:
 
 
 def get_storage_dir() -> Path:
-    return Path(os.environ.get("MALTRACE_STORAGE_DIR", "data/storage"))
+    storage = Path(os.environ.get("MALTRACE_STORAGE_DIR", "data/storage"))
+    storage.mkdir(parents=True, exist_ok=True)
+    return storage
 
 
 def get_db_connection(db_path: Optional[Path] = None) -> sqlite3.Connection:
@@ -23,6 +25,32 @@ def get_db_connection(db_path: Optional[Path] = None) -> sqlite3.Connection:
     target_db.parent.mkdir(parents=True, exist_ok=True)
     conn = sqlite3.connect(str(target_db))
     conn.row_factory = sqlite3.Row
+    conn.execute("""
+        CREATE TABLE IF NOT EXISTS analyses (
+            analysis_id TEXT PRIMARY KEY,
+            sample_id TEXT NOT NULL,
+            sample_hash TEXT NOT NULL,
+            pipeline_version TEXT NOT NULL,
+            model_artifact_version TEXT NOT NULL,
+            vocabulary_version TEXT NOT NULL,
+            technique_catalog_version TEXT NOT NULL,
+            created_at TEXT NOT NULL,
+            status TEXT NOT NULL,
+            predicted_family TEXT,
+            confidence REAL,
+            confidence_label TEXT,
+            event_count INTEGER,
+            process_count INTEGER,
+            technique_count INTEGER,
+            warnings_json TEXT,
+            failure_reason TEXT,
+            raw_file_path TEXT,
+            result_json_path TEXT,
+            report_html_path TEXT,
+            file_size_bytes INTEGER
+        );
+    """)
+    conn.commit()
     return conn
 
 

@@ -32,8 +32,8 @@ jobs:
 
       - name: Install Dependencies & Package
         run: |
-          pip install -e .
+          python -m pip install -e .
 
       - name: Run Pytest Test Suite
         run: |
-          pytest tests/ -v --tb=short
+          python -m pytest tests/ -v --tb=short
