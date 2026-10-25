@@ -1,0 +1,101 @@
+{
+  "vocabulary_version": "1.0.0",
+  "categories": {
+    "process_execution": {
+      "category": "process_execution",
+      "template": "Process {process_name} (PID {process_id}) spawned executable {target_image} with command line {command_line}.",
+      "severity_hint": "info",
+      "required_fields": ["process_id"],
+      "optional_fields": ["image_name", "target_path", "command_line"],
+      "candidate_attack_techniques": ["T1059"]
+    },
+    "command_interpreters": {
+      "category": "command_interpreters",
+      "template": "Process {process_name} (PID {process_id}) launched command shell or interpreter {interpreter_name} with arguments {command_line}.",
+      "severity_hint": "high",
+      "required_fields": ["process_id"],
+      "optional_fields": ["image_name", "command_line"],
+      "candidate_attack_techniques": ["T1059.001", "T1059.003"]
+    },
+    "file_operations": {
+      "category": "file_operations",
+      "template": "Process {process_name} (PID {process_id}) performed {api_action} on file path {target_path}.",
+      "severity_hint": "info",
+      "required_fields": ["process_id", "api_name"],
+      "optional_fields": ["target_path", "desired_access", "bytes_written"],
+      "candidate_attack_techniques": ["T1074"]
+    },
+    "registry_changes": {
+      "category": "registry_changes",
+      "template": "Process {process_name} (PID {process_id}) modified registry key {registry_key} with value name {value_name} and value data {value_data}.",
+      "severity_hint": "medium",
+      "required_fields": ["process_id"],
+      "optional_fields": ["registry_key", "value_name", "value_data"],
+      "candidate_attack_techniques": ["T1112"]
+    },
+    "startup_persistence": {
+      "category": "startup_persistence",
+      "template": "Process {process_name} (PID {process_id}) modified autostart persistence location {registry_key} to launch payload {value_data}.",
+      "severity_hint": "critical",
+      "required_fields": ["process_id"],
+      "optional_fields": ["registry_key", "value_name", "value_data", "target_path"],
+      "candidate_attack_techniques": ["T1547.001"]
+    },
+    "service_changes": {
+      "category": "service_changes",
+      "template": "Process {process_name} (PID {process_id}) created or modified Windows service {service_name} executing binary {binary_path}.",
+      "severity_hint": "high",
+      "required_fields": ["process_id"],
+      "optional_fields": ["service_name", "binary_path"],
+      "candidate_attack_techniques": ["T1543.003"]
+    },
+    "network_connections": {
+      "category": "network_connections",
+      "template": "Process {process_name} (PID {process_id}) initiated outbound network connection to {destination_ip}:{destination_port} ({network_category}) via protocol {protocol}.",
+      "severity_hint": "medium",
+      "required_fields": ["process_id"],
+      "optional_fields": ["destination_ip", "destination_port", "protocol", "domain"],
+      "candidate_attack_techniques": ["T1071.001"]
+    },
+    "discovery": {
+      "category": "discovery",
+      "template": "Process {process_name} (PID {process_id}) executed system discovery query or read environment metadata target {target_path}.",
+      "severity_hint": "medium",
+      "required_fields": ["process_id"],
+      "optional_fields": ["target_path", "desired_access"],
+      "candidate_attack_techniques": ["T1082", "T1083"]
+    },
+    "archive_activity": {
+      "category": "archive_activity",
+      "template": "Process {process_name} (PID {process_id}) created or accessed compressed archive container {target_path}.",
+      "severity_hint": "medium",
+      "required_fields": ["process_id"],
+      "optional_fields": ["target_path", "command_line"],
+      "candidate_attack_techniques": ["T1560"]
+    },
+    "credential_access": {
+      "category": "credential_access",
+      "template": "Process {process_name} (PID {process_id}) accessed credential vault or password store at path {target_path}.",
+      "severity_hint": "critical",
+      "required_fields": ["process_id"],
+      "optional_fields": ["target_path", "desired_access"],
+      "candidate_attack_techniques": ["T1555"]
+    },
+    "injection_activity": {
+      "category": "injection_activity",
+      "template": "Process {process_name} (PID {process_id}) performed remote process memory injection API call {api_name} targeting remote process.",
+      "severity_hint": "critical",
+      "required_fields": ["process_id", "api_name"],
+      "optional_fields": ["target_process_id", "desired_access"],
+      "candidate_attack_techniques": ["T1055"]
+    },
+    "defense_impairment": {
+      "category": "defense_impairment",
+      "template": "Process {process_name} (PID {process_id}) attempted volume shadow copy deletion or defense impairment command: {command_line}.",
+      "severity_hint": "critical",
+      "required_fields": ["process_id"],
+      "optional_fields": ["command_line", "target_path"],
+      "candidate_attack_techniques": ["T1486", "T1562.001"]
+    }
+  }
+}
