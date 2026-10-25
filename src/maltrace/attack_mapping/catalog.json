@@ -1,0 +1,375 @@
+{
+  "catalog_version": "1.0.0",
+  "techniques": [
+    {
+      "technique_id": "T1059.001",
+      "technique_name": "Command and Scripting Interpreter: PowerShell",
+      "tactic": "Execution",
+      "description": "Adversaries may abuse PowerShell commands and scripts for execution.",
+      "required_evidence_patterns": ["powershell", "downloadstring", "invoke-expression", "encodedcommand"],
+      "optional_supporting_patterns": ["-nop", "-w hidden", "-enc", "bypass"],
+      "exclusion_rules": ["powershell.exe -help", "powershell.exe -version"],
+      "base_confidence": 0.85
+    },
+    {
+      "technique_id": "T1059.003",
+      "technique_name": "Command and Scripting Interpreter: Windows Command Shell",
+      "tactic": "Execution",
+      "description": "Adversaries may abuse cmd.exe to execute commands or scripts.",
+      "required_evidence_patterns": ["cmd.exe", "cmd /c", "cmd /k"],
+      "optional_supporting_patterns": ["whoami", "ipconfig", "net user", "vssadmin"],
+      "exclusion_rules": ["cmd.exe /?"]
+    },
+    {
+      "technique_id": "T1059.005",
+      "technique_name": "Command and Scripting Interpreter: Visual Basic",
+      "tactic": "Execution",
+      "description": "Adversaries may abuse Visual Basic scripts for execution.",
+      "required_evidence_patterns": ["wscript.exe", "cscript.exe", ".vbs", ".vbe"],
+      "optional_supporting_patterns": ["wscript.shell"],
+      "exclusion_rules": ["wscript.exe /?"]
+    },
+    {
+      "technique_id": "T1106",
+      "technique_name": "Native API",
+      "tactic": "Execution",
+      "description": "Adversaries may directly invoke native OS system calls.",
+      "required_evidence_patterns": ["ntallocatevirtualmemory", "ntcreatesection", "ntwritevirtualmemory"],
+      "optional_supporting_patterns": ["syscall", "ntdll"],
+      "exclusion_rules": ["ntquerysysteminformation_safe"]
+    },
+    {
+      "technique_id": "T1204.002",
+      "technique_name": "User Execution: Malicious File",
+      "tactic": "Execution",
+      "description": "Adversaries may rely upon a user opening a malicious file.",
+      "required_evidence_patterns": ["vba_macro_exec", "malicious_document_spawn"],
+      "optional_supporting_patterns": ["macro", "winword", ".docm", ".xlsm"],
+      "exclusion_rules": ["winword.exe /safe"]
+    },
+    {
+      "technique_id": "T1547.001",
+      "technique_name": "Boot or Logon Autostart Execution: Registry Run Keys / Startup Folder",
+      "tactic": "Persistence",
+      "description": "Adversaries may achieve persistence by modifying autostart registry keys.",
+      "required_evidence_patterns": ["currentversion\\run", "currentversion\\runonce", "startup", "autorun"],
+      "optional_supporting_patterns": ["regedit", "reg add"],
+      "exclusion_rules": ["queryvalue", "getvalue"]
+    },
+    {
+      "technique_id": "T1053.005",
+      "technique_name": "Scheduled Task/Job: Scheduled Task",
+      "tactic": "Persistence",
+      "description": "Adversaries may abuse task scheduler to execute tasks on a schedule or event.",
+      "required_evidence_patterns": ["schtasks", "/create"],
+      "optional_supporting_patterns": ["/sc minute", "/sc ONSTART", "/tn"],
+      "exclusion_rules": ["schtasks /query"]
+    },
+    {
+      "technique_id": "T1543.003",
+      "technique_name": "Create or Modify System Process: Windows Service",
+      "tactic": "Persistence",
+      "description": "Adversaries may create or modify Windows services to execute payloads.",
+      "required_evidence_patterns": ["createservice", "sc.exe create", "changeserviceconfig", "service"],
+      "optional_supporting_patterns": ["SERVICE_AUTO_START", "binpath"],
+      "exclusion_rules": ["queryservicestatus"]
+    },
+    {
+      "technique_id": "T1136.001",
+      "technique_name": "Create Account: Local Account",
+      "tactic": "Persistence",
+      "description": "Adversaries may create a local account to maintain access.",
+      "required_evidence_patterns": ["net user /add", "net localgroup administrators /add"],
+      "optional_supporting_patterns": ["useradd"],
+      "exclusion_rules": ["net user /help"]
+    },
+    {
+      "technique_id": "T1546.015",
+      "technique_name": "Event Triggered Execution: Component Object Model Hijacking",
+      "tactic": "Persistence",
+      "description": "Adversaries may establish persistence by executing malicious content triggered by COM hijacking.",
+      "required_evidence_patterns": ["inprocserver32", "com_hijack"],
+      "optional_supporting_patterns": ["regsvr32", "dllhost"],
+      "exclusion_rules": ["system_clsid_read"]
+    },
+    {
+      "technique_id": "T1548.002",
+      "technique_name": "Abuse Elevation Control Mechanism: Bypass User Account Control",
+      "tactic": "Privilege Escalation",
+      "description": "Adversaries may bypass UAC mechanisms to elevate privileges.",
+      "required_evidence_patterns": ["fodhelper.exe", "eventvwr.exe uac", "sdclt.exe"],
+      "optional_supporting_patterns": ["currenversion\\app paths", "ms-settings"],
+      "exclusion_rules": ["eventvwr.exe /?"]
+    },
+    {
+      "technique_id": "T1134",
+      "technique_name": "Access Token Manipulation",
+      "tactic": "Privilege Escalation",
+      "description": "Adversaries may modify access tokens to operate under different security contexts.",
+      "required_evidence_patterns": ["adjusttokenprivileges", "sedebugprivilege", "impersonateloggedonuser"],
+      "optional_supporting_patterns": ["openprocesstoken", "privilege_escalation"],
+      "exclusion_rules": ["check_token_membership"]
+    },
+    {
+      "technique_id": "T1055",
+      "technique_name": "Process Injection",
+      "tactic": "Defense Evasion",
+      "description": "Adversaries may inject code into processes to evade process-based defenses.",
+      "required_evidence_patterns": ["virtualalloc-remote", "writeprocessmemory-remote", "createremotethread", "ntunmapviewofsection"],
+      "optional_supporting_patterns": ["process_injection", "remote_process"],
+      "exclusion_rules": ["virtualalloc_self_pid"]
+    },
+    {
+      "technique_id": "T1562.001",
+      "technique_name": "Impair Defenses: Disable or Modify Tools",
+      "tactic": "Defense Evasion",
+      "description": "Adversaries may disable security software or audit logging.",
+      "required_evidence_patterns": ["net stop defender", "sc stop defender", "disablerealtimemonitoring"],
+      "optional_supporting_patterns": ["antivirus_disable", "firewall_disable"],
+      "exclusion_rules": ["net stop benign_service"]
+    },
+    {
+      "technique_id": "T1070.004",
+      "technique_name": "Indicator Removal: File Deletion",
+      "tactic": "Defense Evasion",
+      "description": "Adversaries may delete files left behind by the actions of their software.",
+      "required_evidence_patterns": ["del /f /q", "ntdeletefile", "remove-item -force"],
+      "optional_supporting_patterns": ["self_delete"],
+      "exclusion_rules": ["temp_clean_normal"]
+    },
+    {
+      "technique_id": "T1027",
+      "technique_name": "Obfuscated Files or Information",
+      "tactic": "Defense Evasion",
+      "description": "Adversaries may attempt to make an executable or data difficult to discover or analyze.",
+      "required_evidence_patterns": ["certutil -decode", "frombase64string", "payload_xor"],
+      "optional_supporting_patterns": ["obfuscation"],
+      "exclusion_rules": ["certutil -dump"]
+    },
+    {
+      "technique_id": "T1112",
+      "technique_name": "Modify Registry",
+      "tactic": "Defense Evasion",
+      "description": "Adversaries may interact with the Windows Registry to hide configuration or payload details.",
+      "required_evidence_patterns": ["reg.exe add", "reg.exe delete", "regcreatekeyexw_stealth"],
+      "optional_supporting_patterns": ["registry_hide"],
+      "exclusion_rules": ["reg query"]
+    },
+    {
+      "technique_id": "T1218.011",
+      "technique_name": "System Binary Proxy Execution: Rundll32",
+      "tactic": "Defense Evasion",
+      "description": "Adversaries may abuse rundll32.exe to proxy execution of malicious code.",
+      "required_evidence_patterns": ["rundll32.exe", "dllregisterserver"],
+      "optional_supporting_patterns": ["#1", "entrypoint"],
+      "exclusion_rules": ["rundll32.exe /?"]
+    },
+    {
+      "technique_id": "T1218.010",
+      "technique_name": "System Binary Proxy Execution: Regsvr32",
+      "tactic": "Defense Evasion",
+      "description": "Adversaries may abuse regsvr32.exe to proxy execution of malicious code.",
+      "required_evidence_patterns": ["regsvr32.exe", "/s /u", "scrobj.dll"],
+      "optional_supporting_patterns": ["stager_dll"],
+      "exclusion_rules": ["regsvr32.exe /?"]
+    },
+    {
+      "technique_id": "T1555",
+      "technique_name": "Credentials from Password Stores",
+      "tactic": "Credential Access",
+      "description": "Adversaries may search for credentials stored in web browsers or password managers.",
+      "required_evidence_patterns": ["logindata", "cookies", "passwords", "vault", "credential"],
+      "optional_supporting_patterns": ["chrome", "firefox"],
+      "exclusion_rules": ["safe_password_reset"]
+    },
+    {
+      "technique_id": "T1003.001",
+      "technique_name": "OS Credential Dumping: LSASS Memory",
+      "tactic": "Credential Access",
+      "description": "Adversaries may attempt to dump credentials from the LSASS process memory.",
+      "required_evidence_patterns": ["lsass.exe dump", "minidumpwritedump", "procdump lsass", "sam_dump"],
+      "optional_supporting_patterns": ["sekurlsa"],
+      "exclusion_rules": ["lsass_handle_query_only"]
+    },
+    {
+      "technique_id": "T1056.001",
+      "technique_name": "Input Capture: Keylogging",
+      "tactic": "Credential Access",
+      "description": "Adversaries may log user keystrokes to intercept credentials.",
+      "required_evidence_patterns": ["getasynckeystate", "setwindowshookex", "keylog_buffer"],
+      "optional_supporting_patterns": ["wh_keyboard_ll", "key_capture"],
+      "exclusion_rules": ["keyboard_layout_query"]
+    },
+    {
+      "technique_id": "T1083",
+      "technique_name": "File and Directory Discovery",
+      "tactic": "Discovery",
+      "description": "Adversaries may enumerate files and directories on system.",
+      "required_evidence_patterns": ["findfirstfile", "get-childitem", "dir /s", "tree"],
+      "optional_supporting_patterns": ["*.doc", "*.pdf", "*.xls"],
+      "exclusion_rules": ["read_single_config"]
+    },
+    {
+      "technique_id": "T1082",
+      "technique_name": "System Information Discovery",
+      "tactic": "Discovery",
+      "description": "Adversaries may attempt to get detailed information about operating system and hardware.",
+      "required_evidence_patterns": ["systeminfo", "wmic os", "wmic computersystem", "win32_operatingsystem"],
+      "optional_supporting_patterns": ["os_version", "buildnumber"],
+      "exclusion_rules": ["getversionex"]
+    },
+    {
+      "technique_id": "T1057",
+      "technique_name": "Process Discovery",
+      "tactic": "Discovery",
+      "description": "Adversaries may attempt to get information about running processes on a system.",
+      "required_evidence_patterns": ["tasklist.exe", "get-process", "process32first"],
+      "optional_supporting_patterns": ["process32next"],
+      "exclusion_rules": ["getcurrentprocess"]
+    },
+    {
+      "technique_id": "T1016",
+      "technique_name": "System Network Configuration Discovery",
+      "tactic": "Discovery",
+      "description": "Adversaries may look for details about the network configuration and settings.",
+      "required_evidence_patterns": ["ipconfig.exe", "route print", "arp -a", "getmac.exe"],
+      "optional_supporting_patterns": ["netsh interface"],
+      "exclusion_rules": ["ipconfig /help"]
+    },
+    {
+      "technique_id": "T1049",
+      "technique_name": "System Network Connections Discovery",
+      "tactic": "Discovery",
+      "description": "Adversaries may attempt to get a listing of network connections to or from the host.",
+      "required_evidence_patterns": ["netstat.exe", "get-nettcpconnection", "netstat -ano"],
+      "optional_supporting_patterns": ["established"],
+      "exclusion_rules": ["netstat /?"]
+    },
+    {
+      "technique_id": "T1021.002",
+      "technique_name": "Remote Services: SMB/Windows Admin Shares",
+      "tactic": "Lateral Movement",
+      "description": "Adversaries may use SMB to interact with remote network shares.",
+      "required_evidence_patterns": ["net use \\\\", "admin$", "c$", "smb_exec"],
+      "optional_supporting_patterns": ["ipc$", "psexec"],
+      "exclusion_rules": ["net use /help"]
+    },
+    {
+      "technique_id": "T1570",
+      "technique_name": "Lateral Tool Transfer",
+      "tactic": "Lateral Movement",
+      "description": "Adversaries may transfer tools or files between systems in a compromised environment.",
+      "required_evidence_patterns": ["copy \\\\", "robocopy \\\\", "xcopy \\\\"],
+      "optional_supporting_patterns": ["smb_transfer"],
+      "exclusion_rules": ["copy /?"]
+    },
+    {
+      "technique_id": "T1560",
+      "technique_name": "Archive Collected Data",
+      "tactic": "Collection",
+      "description": "Adversaries may compress data to minimize bandwidth during exfiltration.",
+      "required_evidence_patterns": ["7z", "rar", "zip", "makecab"],
+      "optional_supporting_patterns": [".zip", ".rar", ".7z"],
+      "exclusion_rules": ["unzip_help"]
+    },
+    {
+      "technique_id": "T1113",
+      "technique_name": "Screen Capture",
+      "tactic": "Collection",
+      "description": "Adversaries may take screen captures to harvest information.",
+      "required_evidence_patterns": ["bitblt", "getdc screenshot", "screencap"],
+      "optional_supporting_patterns": ["desktop_dc"],
+      "exclusion_rules": ["gdi_init_only"]
+    },
+    {
+      "technique_id": "T1071.001",
+      "technique_name": "Application Layer Protocol: Web Protocols",
+      "tactic": "Command and Control",
+      "description": "Adversaries may communicate using application layer protocols (HTTP/HTTPS) to blend in.",
+      "required_evidence_patterns": ["outbound_public_ip", "http", "https", "c2_exfil"],
+      "optional_supporting_patterns": ["port_80", "port_443"],
+      "exclusion_rules": ["loopback", "private_network"]
+    },
+    {
+      "technique_id": "T1071.004",
+      "technique_name": "Application Layer Protocol: DNS",
+      "tactic": "Command and Control",
+      "description": "Adversaries may communicate using DNS application protocol queries.",
+      "required_evidence_patterns": ["dns_tunnel", "txt_query", "nslookup c2"],
+      "optional_supporting_patterns": ["port_53"],
+      "exclusion_rules": ["local_dns_resolve"]
+    },
+    {
+      "technique_id": "T1573",
+      "technique_name": "Encrypted Channel",
+      "tactic": "Command and Control",
+      "description": "Adversaries may employ a known encryption algorithm to conceal command and control traffic.",
+      "required_evidence_patterns": ["tls_handshake_c2", "ssl_socket_c2", "rc4_c2"],
+      "optional_supporting_patterns": ["cryptencrypt"],
+      "exclusion_rules": ["https_public_browser"]
+    },
+    {
+      "technique_id": "T1105",
+      "technique_name": "Ingress Tool Transfer",
+      "tactic": "Command and Control",
+      "description": "Adversaries may transfer tools or other files from an external system into a compromised network.",
+      "required_evidence_patterns": ["certutil -urlcache", "bitsadmin /transfer", "curl.exe -o"],
+      "optional_supporting_patterns": ["payload_drop"],
+      "exclusion_rules": ["curl --help"]
+    },
+    {
+      "technique_id": "T1041",
+      "technique_name": "Exfiltration Over C2 Channel",
+      "tactic": "Exfiltration",
+      "description": "Adversaries may steal data by exfiltrating it over an existing command and control channel.",
+      "required_evidence_patterns": ["exfil_post", "data_upload_c2", "telegram_c2"],
+      "optional_supporting_patterns": ["http_post"],
+      "exclusion_rules": ["normal_web_form"]
+    },
+    {
+      "technique_id": "T1048",
+      "technique_name": "Exfiltration Over Alternative Protocol",
+      "tactic": "Exfiltration",
+      "description": "Adversaries may steal data by exfiltrating it over an alternative network protocol like SMTP or FTP.",
+      "required_evidence_patterns": ["smtp.live.com", "ftp_exfil", "mail_smtp_exfil"],
+      "optional_supporting_patterns": ["port_587"],
+      "exclusion_rules": ["internal_mail_sync"]
+    },
+    {
+      "technique_id": "T1486",
+      "technique_name": "Data Encrypted for Impact",
+      "tactic": "Impact",
+      "description": "Adversaries may encrypt data on target systems to interrupt availability.",
+      "required_evidence_patterns": ["vssadmin", ".locked", ".wncry", "decrypt_ransom", "ransom", ".lockbit", "restore-my-files"],
+      "optional_supporting_patterns": ["ransom_note"],
+      "exclusion_rules": ["normal_file_lock"]
+    },
+    {
+      "technique_id": "T1489",
+      "technique_name": "Service Stop",
+      "tactic": "Impact",
+      "description": "Adversaries may stop or disable services to render them unavailable.",
+      "required_evidence_patterns": ["net stop defender", "sc stop defender", "taskkill /f /im av"],
+      "optional_supporting_patterns": ["stop_av"],
+      "exclusion_rules": ["net stop benign_service"]
+    },
+    {
+      "technique_id": "T1490",
+      "technique_name": "Inhibit System Recovery",
+      "tactic": "Impact",
+      "description": "Adversaries may delete or remove built-in data recovery systems like shadow copies.",
+      "required_evidence_patterns": ["recoveryenabled no", "wbadmin delete catalog"],
+      "optional_supporting_patterns": ["bcdedit", "shadowcopy"],
+      "exclusion_rules": ["bcdedit /enum"]
+    },
+    {
+      "technique_id": "T1485",
+      "technique_name": "Data Destruction",
+      "tactic": "Impact",
+      "description": "Adversaries may destroy data and hardware to disrupt availability.",
+      "required_evidence_patterns": ["physicaldrive", "rawdisk sector", "drvdump", "mbr_overwrite", "hermetic"],
+      "optional_supporting_patterns": ["disk_destroy"],
+      "exclusion_rules": ["read_disk_capacity"]
+    }
+  ]
+}
